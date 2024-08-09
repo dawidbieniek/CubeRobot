@@ -4,7 +4,7 @@ namespace CubeRobot.Models.RubiksCube;
 
 public class Cube
 {
-    private const int NumberOfFaces = 6;
+    public const int NumberOfFaces = 6;
 
     private readonly CubeRotationHelper _rotationHelper;
 
@@ -78,6 +78,10 @@ public class Cube
         }
     }
 
+    /// <summary>
+    /// Returns string representation of cube based on <see href="https://github.com/Megalomatt/Kociemba?tab=readme-ov-file#preparing-the-search-string"/>
+    /// </summary>
+    /// <returns> </returns>
     public override string ToString()
     {
         StringBuilder sb = new();

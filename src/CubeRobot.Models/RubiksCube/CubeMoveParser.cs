@@ -19,7 +19,7 @@ public static class CubeMoveParser
 
         for (int i = 0; i < movesInNotation.Length; i++)
         {
-            StringBuilder currentMoveBuilder = new(preparedMovesInNotation[i]);
+            StringBuilder currentMoveBuilder = new(preparedMovesInNotation[i].ToString());
 
             // Try parse long moves (longer than 1 letter)
             if (i + 1 < preparedMovesInNotation.Length)
@@ -33,7 +33,7 @@ public static class CubeMoveParser
                 }
                 else if (nextChar == '2')
                 {
-                    currentMoveBuilder.Append(CubeMoveExtensions.DoubleMoveModivierString);
+                    currentMoveBuilder.Append(CubeMoveExtensions.DoubleMoveModifierString);
                     i++;
                 }
             }
@@ -50,6 +50,6 @@ public static class CubeMoveParser
     private static string PrepareMovesString(string originalString)
     {
         string[] splitMoves = originalString.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries);
-        return string.Join("", splitMoves);
+        return string.Concat(splitMoves);
     }
 }

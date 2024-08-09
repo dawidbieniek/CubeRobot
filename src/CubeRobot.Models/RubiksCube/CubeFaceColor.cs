@@ -4,10 +4,10 @@ public enum CubeFaceColor
 {
     None = -1,
     White = 0,
-    Red = 1,
+    Orange = 1,
     Green = 2,
     Yellow = 3,
-    Orange = 4,
+    Red = 4,
     Blue = 5
 }
 
@@ -17,10 +17,10 @@ public static class CubeFaceColorExtensions
     {
         CubeFaceColor.None => 'X',
         CubeFaceColor.White => 'F',
-        CubeFaceColor.Red => 'L',
+        CubeFaceColor.Orange => 'R',
         CubeFaceColor.Green => 'U',
         CubeFaceColor.Yellow => 'B',
-        CubeFaceColor.Orange => 'R',
+        CubeFaceColor.Red => 'L',
         CubeFaceColor.Blue => 'D',
         _ => throw new ArgumentOutOfRangeException(nameof(color), $"Invalid {nameof(CubeFaceColor)}"),
     };

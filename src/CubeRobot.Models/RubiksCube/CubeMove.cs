@@ -78,7 +78,7 @@ public enum CubeMoveDirection
 public static class CubeMoveExtensions
 {
     public const string PrimeMoveModifierString = "Prime";
-    public const string DoubleMoveModivierString = "2";
+    public const string DoubleMoveModifierString = "2";
 
     private const int MoveTypeMask = 0x0f0;
     private const int MoveDirectionMask = 0x00f;
@@ -96,7 +96,6 @@ public static class CubeMoveExtensions
 
     public static CubeFace CubeFace(this CubeMove move)
     {
-        // TODO: Support for slices and rotations
         return (CubeFace)(((int)move & CubeFaceMask) >> 8);
     }
 }
