@@ -1,0 +1,10 @@
+﻿@page "/"
+@using CubeRobot.Models.RubiksCube
+
+
+<CubeNetDisplay Cube="_cube" />
+
+@code 
+{
+    private Cube _cube = new(3, true);
+}

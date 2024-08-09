@@ -1,0 +1,31 @@
+﻿@using CubeRobot.Models.RubiksCube
+
+<div class="container" style="background-color:pink;">
+    <div class="row">
+        <CubeNetFace HorizontalOffset="true" Stickers="Cube[CubeFace.Up]" />
+    </div>
+    <div class="row">
+        <CubeNetFace Stickers="Cube[CubeFace.Left]" />
+        <CubeNetFace Stickers="Cube[CubeFace.Front]" />
+        <CubeNetFace Stickers="Cube[CubeFace.Right]" />
+        <CubeNetFace Stickers="Cube[CubeFace.Back]" />
+    </div>
+    <div class="row">
+        <CubeNetFace HorizontalOffset="true" Stickers="Cube[CubeFace.Down]" />
+    </div>
+</div>
+
+@code 
+{
+    [Parameter]
+    public Cube Cube { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        Cube.PerformMove(CubeMove.R);
+        Cube.PerformMove(CubeMove.U);
+    }
+
+}

@@ -1,0 +1,38 @@
+﻿@using CubeRobot.Models.RubiksCube
+
+<div class="face @(HorizontalOffset ? "face-offset" : "")" style="--sticker-col-count:@Stickers.GetLength(0);">
+    @for (int y = 0; y < Stickers.GetLength(0); y++)
+    {
+        <div class="row">
+            @for (int x = 0; x < Stickers.GetLength(1); x++)
+            {
+                <div class="sticker @StickerColorClass(Stickers[y,x])"/>
+            }
+        </div>
+    }
+
+</div>
+
+@code 
+{
+    [Parameter]
+    public CubeFaceColor[,] Stickers { get; set; } = null!;
+
+    [Parameter]
+    public bool HorizontalOffset { get; set; } = false;
+
+    private string StickerColorClass(CubeFaceColor color)
+    {
+        return color switch
+        {
+            CubeFaceColor.None => "sticker-gray",
+            CubeFaceColor.White => "sticker-white",
+            CubeFaceColor.Orange => "sticker-orange",
+            CubeFaceColor.Green => "sticker-green",
+            CubeFaceColor.Yellow => "sticker-yellow",
+            CubeFaceColor.Red => "sticker-red",
+            CubeFaceColor.Blue => "sticker-blue",
+            _ => "table-danger"
+        };
+    }
+}

@@ -3,7 +3,7 @@ using System;
 using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 
-namespace App;
+namespace CubeRobot.App;
 
 internal class Program : MauiApplication
 {

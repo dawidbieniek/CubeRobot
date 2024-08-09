@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace App;
+namespace CubeRobot.App;
 public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()

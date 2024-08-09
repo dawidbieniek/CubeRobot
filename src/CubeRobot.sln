@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35111.106
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.App", "CubeRobot.App\CubeRobot.App.csproj", "{BBAD2B52-FAC9-497D-B7A9-655A95773AB0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Models", "CubeRobot.Models\CubeRobot.Models.csproj", "{D0049147-6510-4FA3-952D-6244C27F319B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Solvers", "CubeRobot.Solvers\CubeRobot.Solvers.csproj", "{A26FBDDE-DF82-43E1-9B97-A3A929B60C7C}"
@@ -13,17 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Robot", "CubeRobo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeRobot.Models.Test", "..\test\CubeRobot.Models.Test\CubeRobot.Models.Test.csproj", "{FEBD3BCF-1483-4C7C-B755-9B9B3626787C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeRobot.App", "CubeRobot.App\CubeRobot.App.csproj", "{CFD9F84D-E47D-48C2-837D-0541784E5F02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BBAD2B52-FAC9-497D-B7A9-655A95773AB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBAD2B52-FAC9-497D-B7A9-655A95773AB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBAD2B52-FAC9-497D-B7A9-655A95773AB0}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{BBAD2B52-FAC9-497D-B7A9-655A95773AB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBAD2B52-FAC9-497D-B7A9-655A95773AB0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D0049147-6510-4FA3-952D-6244C27F319B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0049147-6510-4FA3-952D-6244C27F319B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0049147-6510-4FA3-952D-6244C27F319B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -40,6 +35,12 @@ Global
 		{FEBD3BCF-1483-4C7C-B755-9B9B3626787C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEBD3BCF-1483-4C7C-B755-9B9B3626787C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEBD3BCF-1483-4C7C-B755-9B9B3626787C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

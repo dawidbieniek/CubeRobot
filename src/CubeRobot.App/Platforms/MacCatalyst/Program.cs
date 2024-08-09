@@ -2,7 +2,7 @@
 
 using UIKit;
 
-namespace App;
+namespace CubeRobot.App;
 public class Program
 {
     // This is the main entry point of the application.

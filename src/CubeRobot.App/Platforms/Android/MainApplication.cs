@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace App;
+namespace CubeRobot.App;
 [Application]
 public class MainApplication : MauiApplication
 {

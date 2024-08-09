@@ -1,4 +1,4 @@
-﻿namespace App;
+﻿namespace CubeRobot.App;
 
 public partial class App : Application
 {

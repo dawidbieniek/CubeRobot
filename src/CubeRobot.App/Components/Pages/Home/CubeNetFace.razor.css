@@ -1,0 +1,45 @@
+﻿.face {
+    --sticker-size: 20px;
+    --face-size: calc((var(--sticker-size)) * var(--sticker-col-count));
+    width: var(--face-size);
+}
+
+.face-offset {
+    margin-left: var(--face-size);
+}
+
+.sticker {
+    width: var(--sticker-size);
+    height: var(--sticker-size);
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 0;
+}
+
+.sticker-gray {
+    background-color: gray;
+}
+
+.sticker-white {
+    background-color: white;
+}
+
+.sticker-orange {
+    background-color: orange;
+}
+
+.sticker-green {
+    background-color: green;
+}
+
+.sticker-yellow {
+    background-color: yellow;
+}
+
+.sticker-red {
+    background-color: red;
+}
+
+.sticker-blue {
+    background-color: blue;
+}

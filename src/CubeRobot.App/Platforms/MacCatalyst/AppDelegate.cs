@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace App;
+namespace CubeRobot.App;
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate
 {
