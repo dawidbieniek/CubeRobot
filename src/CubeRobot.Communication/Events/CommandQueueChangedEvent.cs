@@ -2,8 +2,8 @@
 
 public delegate void CommandQueueChangedEventHandler(object sender, CommandQueueEventArgs e);
 
-public class CommandQueueEventArgs(RobotMove[] finished, RobotMove[] remaining) : EventArgs
+public class CommandQueueEventArgs(IEnumerable<RobotMove> finished, IEnumerable<RobotMove> remaining) : EventArgs
 {
-    public RobotMove[] FinishedCommands { get; private init; } = finished;
-    public RobotMove[] RemainingCommands { get; private init; } = remaining;
+    public IEnumerable<RobotMove> FinishedCommands { get; private init; } = finished;
+    public IEnumerable<RobotMove> RemainingCommands { get; private init; } = remaining;
 }

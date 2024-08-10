@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Solvers", "CubeRo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Robot", "CubeRobot.Communication\CubeRobot.Robot.csproj", "{5541D6E3-129E-4F35-A284-FF18B437ED7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeRobot.Models.Test", "..\test\CubeRobot.Models.Test\CubeRobot.Models.Test.csproj", "{FEBD3BCF-1483-4C7C-B755-9B9B3626787C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Models.Test", "..\test\CubeRobot.Models.Test\CubeRobot.Models.Test.csproj", "{FEBD3BCF-1483-4C7C-B755-9B9B3626787C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeRobot.App", "CubeRobot.App\CubeRobot.App.csproj", "{CFD9F84D-E47D-48C2-837D-0541784E5F02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.App", "CubeRobot.App\CubeRobot.App.csproj", "{CFD9F84D-E47D-48C2-837D-0541784E5F02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeRobot.Robot.Test", "..\test\CubeRobot.Robot.Test\CubeRobot.Robot.Test.csproj", "{947118A0-BE21-4CCE-B644-8D1D92621062}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CFD9F84D-E47D-48C2-837D-0541784E5F02}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{947118A0-BE21-4CCE-B644-8D1D92621062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{947118A0-BE21-4CCE-B644-8D1D92621062}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{947118A0-BE21-4CCE-B644-8D1D92621062}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{947118A0-BE21-4CCE-B644-8D1D92621062}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,7 +18,7 @@ internal class CubeMoveProcessor
         _movers[(int)Direction.Front] = front;
     }
 
-    public List<RobotMove> ProcessMoves(CubeMove[] moves, out Queue<MutablePair<CubeMove, int>> movesLeftQueue)
+    public List<RobotMove> ProcessMoves(IEnumerable<CubeMove> moves, out Queue<MutablePair<CubeMove, int>> movesLeftQueue)
     {
         // HACK: CHeck if I even need to clone this -> maybe just use original in code
         RotorState[] rotors = (RotorState[])_rotors.Clone();

@@ -8,72 +8,71 @@ namespace CubeRobot.Robot;
 internal class RobotCommunicator : IDisposable
 {
     private readonly CommunicationChannelBase _communication;
-    private readonly Queue<RobotMove> _commandQueue = new();
-    private Queue<MutablePair<CubeMove, int>> _movesLeftQueue = [];
+    private readonly Queue<RobotMove> _commandQueue = [];
+    /// <summary>
+    /// Queue holding moves to be performed along counters indicating number of commands to perform
+    /// for each move
+    /// </summary>
+    private readonly Queue<MutablePair<CubeMove, int>> _cubeMovesLeft = [];
 
     public RobotCommunicator(CommunicationChannelBase communication)
     {
         _communication = communication;
-        _communication.SetReceiveCallback(OnDataRecieved);
+        _communication.DataRecieved += OnDataRecieved;
     }
 
     public event CommandQueueChangedEventHandler CommandQueueChanged = delegate { };
     public event MoveQueueChangedEventHandler MoveQueueChanged = delegate { };
 
-    public Queue<MutablePair<CubeMove, int>> MovesLeftQueue
+    public void SendMovesToRobot(IEnumerable<RobotMove> robotMoves, IEnumerable<MutablePair<CubeMove, int>>? cubeMoves = null)
     {
-        get => _movesLeftQueue;
-        set
+        if (cubeMoves is not null)
         {
-            if (value != _movesLeftQueue)
-            {
-                _movesLeftQueue = value;
-
-                MoveQueueChanged.Invoke(this, new(null, _movesLeftQueue.Select((pair) => pair.Item1).ToArray()));
-            }
+            _cubeMovesLeft.EnqueueRange(cubeMoves);
+            MoveQueueChanged.Invoke(this, new(null, _cubeMovesLeft.Select((pair) => pair.Item1)));
         }
-    }
 
-    public void SendMovesToRobot(params RobotMove[] moves)
-    {
-        _commandQueue.EnqueueRange(moves);
+        if (!robotMoves.Any())
+            return;
+
+        _commandQueue.EnqueueRange(robotMoves);
         CommandQueueChanged.Invoke(this, new([], [.. _commandQueue]));
 
-        _communication.SendMovesToRobot(moves);
+        _communication.SendMovesToRobot(robotMoves);
     }
 
     public void Dispose()
     {
         if (_communication is not null && _communication is IDisposable disposableCommunication)
             disposableCommunication.Dispose();
-
-        GC.SuppressFinalize(this);
     }
 
-    private void OnDataRecieved(string data)
+    private void OnDataRecieved(object sender, CommunicationChannelDataEventArgs e)
     {
-        int dotCount = data.Count(c => c == '.');
+        int dotCount = e.RecievedData.Count(c => c == '.');
 
         for (int i = 0; i < dotCount; i++)
         {
             DequeueDoneCommands();
-            UpdateMoveQueue();
+            DecrementCommandFromMoveQueue();
         }
     }
 
     private void DequeueDoneCommands()
     {
+        if (_commandQueue.Count == 0)
+            return;
+
         List<RobotMove> commands = _commandQueue.DequeueUntilEncountered(RobotMove.Separator);
         CommandQueueChanged.Invoke(this, new([.. commands], [.. _commandQueue]));
     }
 
-    private void UpdateMoveQueue()
+    private void DecrementCommandFromMoveQueue()
     {
-        if (MovesLeftQueue.Count == 0)
+        if (_cubeMovesLeft.Count == 0)
             return;
 
-        // TODO: DEBUG check if mutability is working
-        MutablePair<CubeMove, int> head = MovesLeftQueue.Peek();
+        MutablePair<CubeMove, int> head = _cubeMovesLeft.Peek();
         if (head.Item2 > 1)         // Decrement amount of commands left for first move
             head.Item2--;
         else
@@ -82,7 +81,7 @@ internal class RobotCommunicator : IDisposable
 
     private void DequeueDoneMove(MutablePair<CubeMove, int> head)
     {
-        MovesLeftQueue.Dequeue();
-        MoveQueueChanged.Invoke(this, new(head.Item1, MovesLeftQueue.Select((pair) => pair.Item1).ToArray()));
+        _cubeMovesLeft.Dequeue();
+        MoveQueueChanged.Invoke(this, new(head.Item1, _cubeMovesLeft.Select((pair) => pair.Item1)));
     }
 }

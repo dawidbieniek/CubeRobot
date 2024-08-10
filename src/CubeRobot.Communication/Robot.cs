@@ -1,6 +1,7 @@
 ﻿using CubeRobot.Models.RubiksCube;
 using CubeRobot.Robot.Communication;
 using CubeRobot.Robot.Events;
+using CubeRobot.Robot.Helpers;
 
 namespace CubeRobot.Robot;
 
@@ -42,11 +43,9 @@ public class Robot : IRobot
 
     public void GrabCube()
     {
-        if (_communicator is null)
-            throw new InvalidOperationException("Communication channel must be first configured");
+        CheckIfCommunicatorInitialized();
 
-        _communicator.SendMovesToRobot([.. HighLevelRobotMove.Grab, RobotMove.Separator]);
-
+        _communicator!.SendMovesToRobot([.. HighLevelRobotMove.Grab, RobotMove.Separator]);
         _moveProcessor.SetMovers(MoverState.Close, MoverState.Close, MoverState.Close, MoverState.Close);
 
         CurrentState = RobotState.ReadyForPhotos;
@@ -54,8 +53,7 @@ public class Robot : IRobot
 
     public void PresentCube(CubeFace face)
     {
-        if (_communicator is null)
-            throw new InvalidOperationException("Communication channel must be first configured");
+        CheckIfCommunicatorInitialized();
 
         throw new NotImplementedException();
         //switch (face)
@@ -84,18 +82,19 @@ public class Robot : IRobot
         // TODO: Move cube to initial position
     }
 
-    public void SolveCube(params CubeMove[] moves)
+    public void SolveCube(IEnumerable<CubeMove> moves)
     {
+        CheckIfCommunicatorInitialized();
+
         CurrentState = RobotState.Solving;
         PerformCubeMoves(moves);
     }
 
     public void ReleaseCube()
     {
-        if (_communicator is null)
-            throw new InvalidOperationException("Communication channel must be first configured");
+        CheckIfCommunicatorInitialized();
 
-        _communicator.SendMovesToRobot([.. HighLevelRobotMove.Release, RobotMove.Separator]);
+        _communicator!.SendMovesToRobot([.. HighLevelRobotMove.Release, RobotMove.Separator]);
 
         _moveProcessor.SetMovers(MoverState.Far, MoverState.Far, MoverState.Far, MoverState.Far);
 
@@ -105,16 +104,17 @@ public class Robot : IRobot
     public void Dispose()
     {
         _communicator?.Dispose();
-
-        GC.SuppressFinalize(this);
     }
 
-    private void PerformCubeMoves(params CubeMove[] moves)
+    private void CheckIfCommunicatorInitialized()
     {
         if (_communicator is null)
             throw new InvalidOperationException("Communication channel must be first configured");
+    }
 
-        _communicator.SendMovesToRobot([.. _moveProcessor.ProcessMoves(moves, out List<(CubeMove, int)> movesLeft)]);
-        _communicator.MovesLeftQueue = movesLeft;
+    private void PerformCubeMoves(IEnumerable<CubeMove> moves)
+    {
+        IEnumerable<RobotMove> robotMoves = _moveProcessor.ProcessMoves(moves, out Queue<MutablePair<CubeMove, int>> cubeMovesLeft);
+        _communicator!.SendMovesToRobot(robotMoves, cubeMovesLeft);
     }
 }

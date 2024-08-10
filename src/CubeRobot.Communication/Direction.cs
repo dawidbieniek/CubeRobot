@@ -18,7 +18,7 @@ internal static class DirectionExtensions
             Direction.Right => Direction.Back,
             Direction.Back => Direction.Left,
             Direction.Left => Direction.Front,
-            _ => throw new ArgumentException("Illegal value"),
+            _ => throw new ArgumentException($"Illegal value: {direction}", nameof(direction)),
         };
     }
 
@@ -30,7 +30,7 @@ internal static class DirectionExtensions
             Direction.Left => Direction.Back,
             Direction.Back => Direction.Right,
             Direction.Right => Direction.Front,
-            _ => throw new ArgumentException("Illegal value"),
+            _ => throw new ArgumentException($"Illegal value: {direction}", nameof(direction)),
         };
     }
 
@@ -42,7 +42,7 @@ internal static class DirectionExtensions
             Direction.Right => Direction.Left,
             Direction.Left => Direction.Right,
             Direction.Back => Direction.Front,
-            _ => throw new ArgumentException("Illegal value"),
+            _ => throw new ArgumentException($"Illegal value: {direction}", nameof(direction)),
         };
     }
 
@@ -54,7 +54,7 @@ internal static class DirectionExtensions
             Direction.Right => HighLevelRobotMove.FixRightArm,
             Direction.Left => HighLevelRobotMove.FixLeftArm,
             Direction.Back => HighLevelRobotMove.FixBackArm,
-            _ => throw new ArgumentException("Illegal value")
+            _ => throw new ArgumentException($"Illegal value: {direction}", nameof(direction))
         };
     }
 
@@ -66,7 +66,7 @@ internal static class DirectionExtensions
             Direction.Right => RobotMove.MoveRightForward,
             Direction.Left => RobotMove.MoveLeftForward,
             Direction.Back => RobotMove.MoveBackForward,
-            _ => throw new ArgumentException("Illegal value")
+            _ => throw new ArgumentException($"Illegal value: {direction}", nameof(direction))
         };
     }
 }

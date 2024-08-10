@@ -6,7 +6,7 @@ public abstract class CommunicationChannelBase
 {
     public event CommunicationChannelDataRecievedEventHandler DataRecieved = delegate { };
 
-    public abstract void SendMovesToRobot(params RobotMove[] moves);
+    public abstract void SendMovesToRobot(IEnumerable<RobotMove> moves);
 
     protected virtual void OnDataRecieved(CommunicationChannelDataEventArgs args)
     {

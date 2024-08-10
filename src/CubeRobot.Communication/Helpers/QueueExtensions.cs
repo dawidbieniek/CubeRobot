@@ -7,7 +7,7 @@ public static class QueueExtensions
     /// </summary>
     /// <param name="queue"> The queue to which the elements will be added. </param>
     /// <param name="items"> An array of elements to add to the queue. </param>
-    public static void EnqueueRange<T>(this Queue<T> queue, T[] items)
+    public static void EnqueueRange<T>(this Queue<T> queue, IEnumerable<T> items)
     {
         foreach (T item in items)
             queue.Enqueue(item);

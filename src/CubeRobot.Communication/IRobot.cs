@@ -12,7 +12,7 @@ public interface IRobot
 
     public RobotState CurrentState { get; }
 
-    public void ConfigureCommunicationChannel(CommunicationChannelBase channel);    // TODO: Use DI instead
+    public void ConfigureCommunicationChannel(CommunicationChannelBase channel);
 
     public void GrabCube();
 
@@ -20,7 +20,7 @@ public interface IRobot
 
     public void StopPresenting();
 
-    void SolveCube(params CubeMove[] moves);
+    public void SolveCube(IEnumerable<CubeMove> moves);
 
     public void ReleaseCube();
 }
