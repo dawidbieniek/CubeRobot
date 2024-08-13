@@ -2,28 +2,41 @@
 
 using CubeRobot.Models.RubiksCube;
 
+using Kociemba;
+
 namespace CubeRobot.Solvers;
 
 public class TwoPhaseSolver : ICubeSolver
 {
-    private static readonly Task CreateTablesTask = new(static () => Kociemba.SearchRunTime.solution(Kociemba.Tools.randomCube(), out _, maxDepth: 30, buildTables: true));
-
-    public static void Init()
-    {
-        CreateTablesTask.Start();
-    }
+    private static readonly string RelativeTablesDirectory = Path.Combine("Assets", "TwoPhase", "Tables");
 
     public IEnumerable<CubeMove> SolveCube(Cube cube)
     {
-        if (!CreateTablesTask.IsCompleted)
-            CreateTablesTask.Wait();
+        EnsureTableFilesArePresent();
 
-        string config = cube.ToString();
-        var moves = CubeMoveParser.ParseMoves(Kociemba.Search.solution(config, out string info, maxDepth: 30));// + "U2 F2 R2 L2 F2 U2 R2 L2";   // HACK:!!!!!!!!! Zly ostateczny wzor, ten hack nie moze zostac na koneic
+        string cubeConfiguration = cube.ToString();
+        string solution = Search.solution(cubeConfiguration, out string info);
+        CubeMove[] moves = CubeMoveParser.ParseMoves(solution);
+
 #if DEBUG
         Debug.WriteLine(info);
 #endif
 
         return moves;
+    }
+
+    private static void EnsureTableFilesArePresent()
+    {
+        Tools.EnsureTableDirectory();
+
+        string assetsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RelativeTablesDirectory);
+        string[] assetFiles = Directory.GetFiles(assetsDirectory);
+
+        foreach (string assetFilePath in assetFiles)
+        {
+            string appdataFilePath = Path.Combine(Tools.TableDirectory, Path.GetFileName(assetFilePath));
+            if (!File.Exists(appdataFilePath))
+                File.Copy(assetFilePath, appdataFilePath);
+        }
     }
 }

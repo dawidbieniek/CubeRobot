@@ -17,7 +17,7 @@ public static class CubeMoveParser
         List<CubeMove> moves = [];
         string preparedMovesInNotation = PrepareMovesString(movesInNotation);
 
-        for (int i = 0; i < movesInNotation.Length; i++)
+        for (int i = 0; i < preparedMovesInNotation.Length; i++)
         {
             StringBuilder currentMoveBuilder = new(preparedMovesInNotation[i].ToString());
 

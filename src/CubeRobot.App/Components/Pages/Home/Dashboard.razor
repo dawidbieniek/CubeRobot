@@ -1,10 +1,65 @@
 ﻿@page "/"
 @using CubeRobot.Models.RubiksCube
-
+@using CubeRobot.Solvers
 
 <CubeNetDisplay Cube="_cube" />
+@if(solve.Count > 0)
+{
+    foreach(var s in solve)
+    {
+        <h4>@s.ToString()</h4>
+    }
+}
 
 @code 
 {
     private Cube _cube = new(3, true);
+
+    List<CubeMove> scramble = new List<CubeMove>
+    {
+        CubeMove.U2,
+        CubeMove.R2,
+        CubeMove.F,
+        CubeMove.B2,
+        CubeMove.R,
+        CubeMove.D2,
+        CubeMove.BPrime,
+        CubeMove.U2,
+        CubeMove.B2,
+        CubeMove.D,
+        CubeMove.FPrime,
+        CubeMove.D2,
+        CubeMove.B,
+        CubeMove.F,
+        CubeMove.D,
+        CubeMove.FPrime,
+        CubeMove.L2,
+        CubeMove.F2,
+        CubeMove.L2,
+        CubeMove.R,
+        CubeMove.B,
+        CubeMove.DPrime,
+        CubeMove.F2,
+        CubeMove.R2,
+        CubeMove.B
+    };
+
+    private List<CubeMove> solve = [];
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        ScrampleCube();
+
+        TwoPhaseSolver solver = new TwoPhaseSolver();
+        solve = solver.SolveCube(_cube).ToList();
+    }
+
+
+    private void ScrampleCube()
+    {
+        foreach (var m in scramble)
+            _cube.PerformMove(m);
+    }
 }

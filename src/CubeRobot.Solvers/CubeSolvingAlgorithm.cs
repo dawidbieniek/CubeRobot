@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
 
-using CubeRobot.Solvers;
-
 namespace CubeRobot.Solvers;
 
 public enum CubeSolvingAlgorithm
@@ -11,7 +9,6 @@ public enum CubeSolvingAlgorithm
     LBL = 1,
     [Description("CFOP (not implemented)")]
     CFOP = 2
-}
 }
 
 public static class SolvingAlgorithmExtensions

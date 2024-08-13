@@ -7,7 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\TwoPhase\Tables\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\TwoPhase\Tables\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CubeRobot.Models\CubeRobot.Models.csproj" />
+    <ProjectReference Include="..\Kociemba\Kociemba.csproj" />
   </ItemGroup>
 
 </Project>

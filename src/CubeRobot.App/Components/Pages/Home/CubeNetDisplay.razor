@@ -19,13 +19,4 @@
 {
     [Parameter]
     public Cube Cube { get; set; } = null!;
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-
-        Cube.PerformMove(CubeMove.R);
-        Cube.PerformMove(CubeMove.U);
-    }
-
 }
