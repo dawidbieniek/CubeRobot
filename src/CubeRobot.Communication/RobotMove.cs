@@ -45,7 +45,7 @@ internal static class HighLevelRobotMove
 
 public static class RobotMoveExtensions
 {
-    public static string ToProtocolString(this RobotMove move) => $"'{(char)move}'";
+    public static string ToProtocolString(this RobotMove move) => $"{(char)move}";
 
-    public static string ToProtocolString(this RobotMove[] moves) => string.Concat(moves.Select(m => m.ToProtocolString()));
+    public static string ToProtocolString(this IEnumerable<RobotMove> moves) => string.Concat(moves.Select(m => m.ToProtocolString()));
 }

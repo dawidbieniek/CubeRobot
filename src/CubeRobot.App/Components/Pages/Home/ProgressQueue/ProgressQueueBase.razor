@@ -1,0 +1,70 @@
+﻿@using System.Text
+@typeparam T where T : notnull
+
+<div class="form-group col-md-12">
+    <label for="textLabel">@Title</label>
+    <div class="progress">
+        <div class="progress-bar  progress-bar-striped @(Progress < MaxProgress ? "progress-bar-animated" : "")" style="width: @(ProgressPercent)%;">@Progress / @MaxProgress</div>
+    </div>
+    <input type="text" readonly class="form-control mt-1" id="textLabel" placeholder="@Text">
+</div>
+
+@code 
+{
+    private List<T> _queueValue = null!;
+
+    [Parameter, EditorRequired]
+    public List<T> Queue { get; set; } = null!;
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    protected string Text { get; set; } = string.Empty;
+    protected int Progress { get; set; } = 0;
+    protected double ProgressPercent => 100D * Progress / MaxProgress;
+    protected int MaxProgress { get; set; } = 1;  // Min value should be 1. When its 0, the bar is rendered weirdly
+
+    protected List<T> QueueValue
+    {
+        get => _queueValue;
+        private set
+        {
+            _queueValue = value;
+
+            MaxProgress = Math.Max(_queueValue.Count, 1);
+            Progress = 0;
+            UpdateText();
+        }
+    }
+
+    public void AdvanceProgress()
+    {
+        if (Progress >= MaxProgress)
+            return;
+
+        Progress++;
+        Queue.RemoveAt(0);
+
+        UpdateText();
+
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (QueueValue != Queue)
+            QueueValue = Queue;
+    }
+
+    protected virtual void UpdateText()
+    {
+        StringBuilder sb = new();
+
+        foreach (T item in QueueValue)
+        {
+            sb.Append(item.ToString());
+            sb.Append(' ');
+        }
+
+        Text = sb.ToString();
+    }
+}

@@ -22,7 +22,7 @@ public class SerialPortCommunication : CommunicationChannelBase, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public override void SendMovesToRobot(params RobotMove[] moves)
+    public override void SendMovesToRobot(IEnumerable<RobotMove> moves)
     {
         _port.Write(moves.ToProtocolString());
 
