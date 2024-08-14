@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.App", "CubeRobot.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Robot.Test", "..\test\CubeRobot.Robot.Test\CubeRobot.Robot.Test.csproj", "{947118A0-BE21-4CCE-B644-8D1D92621062}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kociemba", "Kociemba\Kociemba.csproj", "{58011365-6E92-477D-A0BE-A97CF611FBAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kociemba", "Kociemba\Kociemba.csproj", "{58011365-6E92-477D-A0BE-A97CF611FBAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
