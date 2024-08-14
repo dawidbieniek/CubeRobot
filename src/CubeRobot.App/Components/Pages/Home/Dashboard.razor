@@ -4,6 +4,8 @@
 @using CubeRobot.App.Components.Pages.Home.ProgressQueue;
 @using CubeRobot.Models.RubiksCube
 @using CubeRobot.Robot
+@using CubeRobot.Robot.Communication
+@using CubeRobot.Robot.Events
 
 @* <NavBar Title="CubeRobot panel sterowania" Buttons="@([("RobotSettings", "settings/robot")])" ></NavBar> *@
 
@@ -38,12 +40,7 @@
                             </select>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="portSelect">Port USB</label>
-                            <select class="form-control" id="portSelect">
-                                <option>Port 1</option>
-                                <option>Port 2</option>
-                                <!-- Add more options as needed -->
-                            </select>
+                            <SerialPortSelector SelectionChanged="ChangeSelectedPort" />
                         </div>
                     </div>
                     <div class="form-row row">
@@ -117,10 +114,39 @@
 
 @code 
 {
+    [Inject]
+    public IRobot Robot { get; set; } = null!;
+
     private Cube _cube = new(3, true);
 
     private List<RobotMove> _commandQueue = [];
     private RobotMoveProgressQueue _robotMoveProgressQueue = null!; // Reference
     private List<CubeMove> _moveQueue = [];
     private CubeMoveProgressQueue _cubeMoveProgressQueue = null!; // Reference
+
+    protected override void OnInitialized()
+    {
+        Robot.MoveQueueChanged += OnRobotMoveQueueChanged;
+    }
+
+    private void OnRobotMoveQueueChanged(object sender, MoveQueueEventArgs e)
+    {
+        if (e.FinishedMove is null)
+            _moveQueue = [.. e.RemainingMoves];
+        else
+            _robotMoveProgressQueue.AdvanceProgress();
+    }
+
+    private void OnRobotCommandQueueChanged(object sender, CommandQueueEventArgs e)
+    {
+        if (e.FinishedCommands.Count() == 0)
+            _commandQueue = [.. e.RemainingCommands];
+        else
+            _robotMoveProgressQueue.AdvanceProgress(e.RemainingCommands.Count());
+    }
+
+    private void ChangeSelectedPort(string portName)
+    {
+        Robot.ConfigureCommunicationChannel(new SerialPortCommunication(portName));
+    }
 }

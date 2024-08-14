@@ -3,11 +3,11 @@ using System.IO.Ports;
 
 namespace CubeRobot.Robot.Communication;
 
-public class SerialPortCommunication : CommunicationChannelBase, IDisposable
+public sealed class SerialPortCommunication : CommunicationChannelBase, IDisposable
 {
     private readonly SerialPort _port;
 
-    public SerialPortCommunication(string portName, int baudRate)
+    public SerialPortCommunication(string portName, int baudRate = 9600)
     {
         _port = new(portName, baudRate);
         _port.DataReceived += OnPortDataRecieved;
@@ -19,7 +19,6 @@ public class SerialPortCommunication : CommunicationChannelBase, IDisposable
     public void Dispose()
     {
         _port.Close();
-        GC.SuppressFinalize(this);
     }
 
     public override void SendMovesToRobot(IEnumerable<RobotMove> moves)
