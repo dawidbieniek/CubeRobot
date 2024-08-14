@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Robot.Test", "..\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kociemba", "Kociemba\Kociemba.csproj", "{58011365-6E92-477D-A0BE-A97CF611FBAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeRobot.Util", "CubeRobot.Util\CubeRobot.Util.csproj", "{46232A00-AD5C-44CE-931C-C8D318B8ABE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{58011365-6E92-477D-A0BE-A97CF611FBAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58011365-6E92-477D-A0BE-A97CF611FBAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58011365-6E92-477D-A0BE-A97CF611FBAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46232A00-AD5C-44CE-931C-C8D318B8ABE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46232A00-AD5C-44CE-931C-C8D318B8ABE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46232A00-AD5C-44CE-931C-C8D318B8ABE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46232A00-AD5C-44CE-931C-C8D318B8ABE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

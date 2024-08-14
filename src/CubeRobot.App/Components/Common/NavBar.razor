@@ -1,15 +1,15 @@
-﻿<nav class="navbar navbar-expand-lg p-2 navbar-dark bg-dark">
+﻿<nav class="navbar navbar-expand p-2 navbar-dark bg-primary">
     @if(OnBackClicked.HasDelegate)
     {
-        <button class="btn btn-primary me-2" @onclick="() => OnBackClicked.InvokeAsync()">Wróć</button>
+        <button class="btn btn-outline-light me-2" @onclick="() => OnBackClicked.InvokeAsync()">Wróć</button>
     }
     <span class="navbar-brand">Robot Cube Solver Control Panel</span>
-    <div class="collapse navbar-collapse justify-content-end">
+    <div class="ms-auto">
         <ul class="navbar-nav">
             @foreach((string title, string link) button in Buttons)
             {
                 <li class="nav-item">
-                    <a class="btn btn-primary" href="@button.link">@button.title</a>
+                    <a class="btn btn-outline-light" href="@button.link">@button.title</a>
                 </li>
             }
         </ul>

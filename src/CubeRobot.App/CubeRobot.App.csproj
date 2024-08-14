@@ -94,6 +94,7 @@
     <ItemGroup>
       <ProjectReference Include="..\CubeRobot.Models\CubeRobot.Models.csproj" />
       <ProjectReference Include="..\CubeRobot.Solvers\CubeRobot.Solvers.csproj" />
+      <ProjectReference Include="..\CubeRobot.Util\CubeRobot.Util.csproj" />
     </ItemGroup>
 
 </Project>

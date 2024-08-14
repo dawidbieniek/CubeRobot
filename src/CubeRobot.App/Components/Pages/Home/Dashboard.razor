@@ -1,7 +1,132 @@
 ﻿@page "/"
 
+@using CubeRobot.App.Components.Pages.Home.CubePreview
+@using CubeRobot.Models.RubiksCube
+
 <NavBar Title="CubeRobot panel sterowania" Buttons="@([("RobotSettings", "settings/robot")])" ></NavBar>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Left Sidebar -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <CubePreview Cube="_cube" />
+                    <div class="form-group mt-2">
+                        <label for="currentConfig">Układ kostki</label>
+                        <textarea class="form-control" readonly style="resize:none;font-family:monospace">@_cube.ToString()</textarea>
+                    </div>
+                    <button class="btn btn-primary mt-2">Wprowadź konfigurację kostki</button>
+                </div>
+            </div>
+        </div>
+        <!-- Right Content Area -->
+        <div class="col-md-8">
+            <!-- Status & Controls Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="algorithmSelect">Algorithm</label>
+                            <select class="form-control" id="algorithmSelect">
+                                <option>Algorithm 1</option>
+                                <option>Algorithm 2</option>
+                                <!-- Add more options as needed -->
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="portSelect">Connection Port</label>
+                            <select class="form-control" id="portSelect">
+                                <option>Port 1</option>
+                                <option>Port 2</option>
+                                <!-- Add more options as needed -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="timeToFind">Time to Find Solution</label>
+                            <input type="text" readonly class="form-control" id="timeToFind" placeholder="0.00s">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="timeToSolve">Time to Solve the Cube</label>
+                            <input type="text" readonly class="form-control" id="timeToSolve" placeholder="0.00s">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="movesLeft">Moves Left</label>
+                            <div class="progress">
+                                <span class="progress-text ml-auto">50/100</span>
+                                <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <input type="text" readonly class="form-control" id="movesLeft" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="commandsLeft">Commands Left</label>
+                            <div class="progress">
+                                <span class="progress-text ml-auto">75/100</span>
+                                <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <input type="text" readonly class="form-control" id="commandsLeft" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arm & Rotor Status Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="mb-2">Current Robot State: Idle</p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Position</th>
+                                <th scope="col">Arm State</th>
+                                <th scope="col">Rotor State</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Front</td>
+                                <td>Arm 1 State</td>
+                                <td>Rotor 1 State</td>
+                            </tr>
+                            <tr>
+                                <td>Left</td>
+                                <td>Arm 2 State</td>
+                                <td>Rotor 2 State</td>
+                            </tr>
+                            <tr>
+                                <td>Right</td>
+                                <td>Arm 3 State</td>
+                                <td>Rotor 3 State</td>
+                            </tr>
+                            <tr>
+                                <td>Back</td>
+                                <td>Arm 4 State</td>
+                                <td>Rotor 4 State</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-primary mr-2">Proceed to Next State</button>
+                        <button type="button" class="btn btn-secondary">Skip Current State</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Display Section -->
+            <div class="alert alert-danger" role="alert">
+                Error: Connection lost. Please reconnect.
+            </div>
+        </div>
+    </div>
+</div>
 
 @code 
 {
+    private Cube _cube = new(3, true);
 }

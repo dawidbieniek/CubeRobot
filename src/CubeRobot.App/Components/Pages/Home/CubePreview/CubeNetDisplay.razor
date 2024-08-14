@@ -1,6 +1,6 @@
 ﻿@using CubeRobot.Models.RubiksCube
 
-<div class="container" style="background-color:pink;">
+<div class="container bg-danger">
     <div class="row">
         <CubeNetFace HorizontalOffset="true" Stickers="Cube[CubeFace.Up]" />
     </div>
@@ -17,6 +17,6 @@
 
 @code 
 {
-    [Parameter]
+    [Parameter, EditorRequired]
     public Cube Cube { get; set; } = null!;
 }
