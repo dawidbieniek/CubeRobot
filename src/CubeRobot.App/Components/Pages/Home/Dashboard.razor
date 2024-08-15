@@ -16,7 +16,7 @@
         <div class="col-md-4">
             <div class="card mb-4">
                 <div class="card-body">
-                    @* <CubePreview Cube="_cube" /> *@
+                    <CubePreview Cube="_cube" />
                     <div class="form-group mt-2">
                         <label for="currentConfig">Układ kostki</label>
                         <textarea id="currentConfig" class="form-control" readonly style="resize:none;font-family:monospace">@_cube.ToString()</textarea>
@@ -42,11 +42,11 @@
                     <div class="form-row row">
                         <div class="form-group col-md-6">
                             <label for="timeToFind">Czas znalezienia rozwiązania kostki</label>
-                            <input type="text" readonly class="form-control" id="timeToFind" placeholder="0.00s">
+                            <input type="text" readonly class="form-control" id="timeToFind" placeholder="to be done">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="timeToSolve">Czas ułożenia kostki</label>
-                            <input type="text" readonly class="form-control" id="timeToSolve" placeholder="0.00s">
+                            <input type="text" readonly class="form-control" id="timeToSolve" placeholder="to be done">
                         </div>
                     </div>
                     <div class="form-row">
@@ -94,16 +94,21 @@
                         </tbody>
                     </table>
                     <div class="d-flex justify-content-end mt-3">
-                        <button type="button" class="btn btn-primary mr-2">Proceed to Next State</button>
-                        <button type="button" class="btn btn-secondary">Skip Current State</button>
+                        <RobotControllButtonPanel RobotState="Robot.CurrentState"/> @* TODO: Check if component get parameter update upon robot state change *@
                     </div>
                 </div>
             </div>
-
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
             <!-- Error Display Section -->
-            <div class="alert alert-danger" role="alert">
-                Error: Connection lost. Please reconnect.
-            </div>
+            @foreach (string error in _errors)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @error
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -120,6 +125,8 @@
     private RobotMoveProgressQueue _robotMoveProgressQueue = null!; // Reference
     private List<CubeMove> _moveQueue = [];
     private CubeMoveProgressQueue _cubeMoveProgressQueue = null!; // Reference
+
+    private IEnumerable<string> _errors = ["test error", "test error2"];
 
     protected override void OnInitialized()
     {
