@@ -18,6 +18,6 @@ public static class EnumExtensions
 
         DescriptionAttribute? attr = info.GetCustomAttribute(typeof(DescriptionAttribute), false) as DescriptionAttribute;
 
-        return attr?.Description;
+        return attr?.Description ?? enumValue.ToString();
     }
 }

@@ -6,6 +6,7 @@
 @using CubeRobot.Robot
 @using CubeRobot.Robot.Communication
 @using CubeRobot.Robot.Events
+@using CubeRobot.Solvers
 
 @* <NavBar Title="CubeRobot panel sterowania" Buttons="@([("RobotSettings", "settings/robot")])" ></NavBar> *@
 
@@ -18,7 +19,7 @@
                     @* <CubePreview Cube="_cube" /> *@
                     <div class="form-group mt-2">
                         <label for="currentConfig">Układ kostki</label>
-                        <textarea class="form-control" readonly style="resize:none;font-family:monospace">@_cube.ToString()</textarea>
+                        <textarea id="currentConfig" class="form-control" readonly style="resize:none;font-family:monospace">@_cube.ToString()</textarea>
                     </div>
                     <button class="btn btn-primary mt-2">Wprowadź konfigurację kostki</button>
                 </div>
@@ -32,12 +33,7 @@
                 <div class="card-body">
                     <div class="form-row row">
                         <div class="form-group col-md-6">
-                            <label for="algorithmSelect">Algorytm układania kostki</label>
-                            <select class="form-control" id="algorithmSelect">
-                                <option>Algorithm 1</option>
-                                <option>Algorithm 2</option>
-                                <!-- Add more options as needed -->
-                            </select>
+                            <AlgorithmSelector SelectionChanged="ChangeSelectedAlgorithm"/>
                         </div>
                         <div class="form-group col-md-6">
                             <SerialPortSelector SelectionChanged="ChangeSelectedPort" />
@@ -117,6 +113,7 @@
     [Inject]
     public IRobot Robot { get; set; } = null!;
 
+    private ICubeSolver Solver = new TwoPhaseSolver();
     private Cube _cube = new(3, true);
 
     private List<RobotMove> _commandQueue = [];
@@ -149,4 +146,10 @@
     {
         Robot.ConfigureCommunicationChannel(new SerialPortCommunication(portName));
     }
+
+    private void ChangeSelectedAlgorithm(CubeSolvingAlgorithm algorithm)
+    {
+        Solver = algorithm.Solver();
+    }
+
 }

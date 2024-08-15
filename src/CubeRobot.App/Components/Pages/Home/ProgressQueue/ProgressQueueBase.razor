@@ -2,11 +2,11 @@
 @typeparam T where T : notnull
 
 <div class="form-group col-md-12">
-    <label for="textLabel">@Title</label>
+    <label for="@this.GetHashCode()">@Title</label>
     <div class="progress">
         <div class="progress-bar  progress-bar-striped @(Progress < MaxProgress ? "progress-bar-animated" : "")" style="width: @(ProgressPercent)%;">@Progress / @MaxProgress</div>
     </div>
-    <input type="text" readonly class="form-control mt-1" id="textLabel" placeholder="@Text">
+    <input id="@this.GetHashCode()" type="text" readonly class="form-control mt-1" placeholder="@Text">
 </div>
 
 @code 

@@ -1,0 +1,17 @@
+﻿@using CubeRobot.Solvers
+
+<label for="algorithmSelect">Algorytm układania kostki</label>
+<InputSelect id="algorithmSelect" class="form-control" @bind-Value="_selectedAlgorithm" @bind-Value:after="() => SelectionChanged.InvokeAsync(_selectedAlgorithm)">
+    @foreach (CubeSolvingAlgorithm option in Enum.GetValues(typeof(CubeSolvingAlgorithm)))
+    {
+        <option value="@option">@option.GetDescriptor()</option>
+    }
+</InputSelect>
+
+@code
+{
+    [Parameter]
+    public EventCallback<CubeSolvingAlgorithm> SelectionChanged { get; set; }
+
+    private CubeSolvingAlgorithm _selectedAlgorithm;
+}

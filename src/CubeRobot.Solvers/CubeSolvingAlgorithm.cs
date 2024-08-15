@@ -18,8 +18,8 @@ public static class SolvingAlgorithmExtensions
         return algorithm switch
         {
             CubeSolvingAlgorithm.TwoPhase => new TwoPhaseSolver(),
-            CubeSolvingAlgorithm.LBL => throw new NotImplementedException(),
-            CubeSolvingAlgorithm.CFOP => throw new NotImplementedException(),
+            CubeSolvingAlgorithm.LBL => new TwoPhaseSolver(),//throw new NotImplementedException(),
+            CubeSolvingAlgorithm.CFOP => new TwoPhaseSolver(),//throw new NotImplementedException(),
             _ => throw new ArgumentException($"No solver for {algorithm}")
         };
     }
