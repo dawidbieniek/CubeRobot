@@ -1,4 +1,5 @@
 ﻿using CubeRobot.Models.RubiksCube;
+using CubeRobot.Robot.Events;
 using CubeRobot.Robot.Helpers;
 
 namespace CubeRobot.Robot;
@@ -10,12 +11,16 @@ internal class CubeMoveProcessor
 
     private bool _cubeTitled = false;
 
+    public event RobotEffectorsStateChangedEventHandler RobotEffectorsStateChanged = delegate { };
+
     public void SetMovers(MoverState left, MoverState back, MoverState right, MoverState front)
     {
         _movers[(int)Direction.Left] = left;
         _movers[(int)Direction.Back] = back;
         _movers[(int)Direction.Right] = right;
         _movers[(int)Direction.Front] = front;
+
+        RobotEffectorsStateChanged?.Invoke(this, new(_rotors, _movers));
     }
 
     public List<RobotMove> ProcessMoves(IEnumerable<CubeMove> moves, out Queue<MutablePair<CubeMove, int>> movesLeftQueue)
@@ -36,6 +41,8 @@ internal class CubeMoveProcessor
         }
         _rotors = rotors;
         _movers = movers;
+
+        RobotEffectorsStateChanged?.Invoke(this, new(_rotors, _movers));
 
         return commands;
     }

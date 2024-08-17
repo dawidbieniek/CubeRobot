@@ -4,28 +4,28 @@ namespace CubeRobot.Robot;
 
 public enum RobotState
 {
-    [Description("niepodłączony")]
+    [Description("Niepodłączony")]
     Disconnected,
-    [Description("brak kostki")]
+    [Description("Brak kostki")]
     NoCube,
-    [Description("gotowy do analizy")]
+    [Description("Gotowy do analizy")]
     ReadyForPhotos,
-    [Description("prezentuje kostkę (1/6)")]
+    [Description("Prezentuje kostkę (1/6)")]
     Presenting1,
-    [Description("prezentuje kostkę (2/6)")]
+    [Description("Prezentuje kostkę (2/6)")]
     Presenting2,
-    [Description("prezentuje kostkę (3/6)")]
+    [Description("Prezentuje kostkę (3/6)")]
     Presenting3,
-    [Description("prezentuje kostkę (4/6)")]
+    [Description("Prezentuje kostkę (4/6)")]
     Presenting4,
-    [Description("prezentuje kostkę (5/6)")]
+    [Description("Prezentuje kostkę (5/6)")]
     Presenting5,
-    [Description("prezentuje kostkę (6/6)")]
+    [Description("Prezentuje kostkę (6/6)")]
     Presenting6,
-    [Description("układa kostkę")]
+    [Description("Układa kostkę")]
     Solving,
-    [Description("gotowy do odbioru kostki")]
+    [Description("Gotowy do odbioru kostki")]
     ReadyForRelease,
-    [Description("resetuje")]
+    [Description("Resetuje")]
     Resetting,
 }

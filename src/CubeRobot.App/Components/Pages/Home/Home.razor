@@ -1,0 +1,172 @@
+﻿@page "/"
+
+@using CubeRobot.App.Components.Pages.Home.CubePreview
+@using CubeRobot.App.Components.Pages.Home.ProgressQueue;
+@using CubeRobot.Models.RubiksCube
+@using CubeRobot.Robot
+@using CubeRobot.Robot.Communication
+@using CubeRobot.Robot.Events
+@using CubeRobot.Solvers
+
+@inject NavigationManager Navigation
+
+<NavBar Title="CubeRobot panel sterowania" Buttons="@([("RobotSettings", "settings/robot")])" ></NavBar>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Left Sidebar - cube configuration -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <CubePreview Cube="_cube" />
+                    <div class="form-group mt-2">
+                        <label for="currentConfig">Układ kostki</label>
+                        <textarea id="currentConfig" class="form-control" readonly style="resize:none;font-family:monospace">@_cube.ToString()</textarea>
+                    </div>
+                    <button @onclick="@(() => Navigation.NavigateTo("/cube-input"))" class="btn btn-primary mt-2">Wprowadź konfigurację kostki</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content Area -->
+        <div class="col-md-8">
+            <!-- Settings Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="form-row row">
+                        <div class="form-group col-md-6">
+                            <AlgorithmSelector SelectionChanged="ChangeSelectedAlgorithm"/>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <SerialPortSelector SelectionChanged="ChangeSelectedPort" />
+                        </div>
+                    </div>
+                    <div class="form-row row">
+                        <div class="form-group col-md-6">
+                            <label for="timeToFind">Czas znalezienia rozwiązania kostki</label>
+                            <input type="text" readonly class="form-control" id="timeToFind" placeholder="to be done">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="timeToSolve">Czas ułożenia kostki</label>
+                            <input type="text" readonly class="form-control" id="timeToSolve" placeholder="to be done">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <CubeMoveProgressQueue @ref="_cubeMoveProgressQueue" Title="Pozostałe ruchy" Queue="_moveQueue" />
+                    </div>
+                    <div class="form-row">
+                        <RobotMoveProgressQueue @ref="_robotMoveProgressQueue" Title="Pozostałe komendy" Queue="_commandQueue"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- State Section -->
+            <div class="card mb-4">
+                <div class="card-body">                   
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Stan ramienia</th>
+                                <th scope="col">Stan rotora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Przód</td>
+                                <td>@_robotMovers[0].GetDescriptor()</td>
+                                <td>@_robotRotors[0].GetDescriptor()</td>
+                            </tr>
+                            <tr>
+                                <td>Lewo</td>
+                                <td>@_robotMovers[1].GetDescriptor()</td>
+                                <td>@_robotRotors[1].GetDescriptor()</td>
+                            </tr>
+                            <tr>
+                                <td>Prawo</td>
+                                <td>@_robotMovers[2].GetDescriptor()</td>
+                                <td>@_robotRotors[2].GetDescriptor()</td>
+                            </tr>
+                            <tr>
+                                <td>Tył</td>
+                                <td>@_robotMovers[3].GetDescriptor()</td>
+                                <td>@_robotRotors[3].GetDescriptor()</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-between mt-3">
+                        <h4>Stan robota: <span class="badge rounded-pill bg-primary">@_robotState.GetDescriptor()</span></h4>
+                        <div>
+                            <RobotControllButtonPanel RobotState="Robot.CurrentState"/> @* TODO: Check if component get parameter update upon robot state change *@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code 
+{
+    [Inject]
+    public IRobot Robot { get; set; } = null!;
+
+    [CascadingParameter]
+    private IErrorDisplay ErrorDisplay { get; set; } = null!;
+
+    private ICubeSolver Solver = new TwoPhaseSolver();
+    private Cube _cube = new(3, true);
+
+    private List<RobotMove> _commandQueue = [];
+    private RobotMoveProgressQueue _robotMoveProgressQueue = null!; // Reference
+    private List<CubeMove> _moveQueue = [];
+    private CubeMoveProgressQueue _cubeMoveProgressQueue = null!; // Reference
+
+    private RobotState _robotState = RobotState.Disconnected;
+    private RotorState[] _robotRotors = Enumerable.Repeat(RotorState.Unknown, 4).ToArray();
+    private MoverState[] _robotMovers = Enumerable.Repeat(MoverState.Unknown, 4).ToArray();
+
+    protected override void OnInitialized()
+    {
+        Robot.RobotStateChanged += (s, e) => _robotState = e.CurrentState;
+        Robot.MoveQueueChanged += OnRobotMoveQueueChanged;
+        Robot.RobotEffectorsStateChanged += OnRobotEffectorsStateChanged;
+
+        ErrorDisplay.AddErrors("Test error");
+    }
+
+    private void OnRobotMoveQueueChanged(object sender, MoveQueueEventArgs e)
+    {
+        if (e.FinishedMove is null)
+            _moveQueue = [.. e.RemainingMoves];
+        else
+            _robotMoveProgressQueue.AdvanceProgress();
+    }
+
+    private void OnRobotCommandQueueChanged(object sender, CommandQueueEventArgs e)
+    {
+        if (e.FinishedCommands.Count() == 0)
+            _commandQueue = [.. e.RemainingCommands];
+        else
+            _robotMoveProgressQueue.AdvanceProgress(e.RemainingCommands.Count());
+    }
+
+    private void OnRobotEffectorsStateChanged(object sender, RobotEffectorsEventArgs e)
+    {
+        _robotRotors = e.RotorStates;
+        _robotMovers = e.MoverStates;
+
+        // TODO: StatehasChanged??
+    }
+
+    private void ChangeSelectedPort(string portName)
+    {
+        Robot.ConfigureCommunicationChannel(new SerialPortCommunication(portName));
+    }
+
+    private void ChangeSelectedAlgorithm(CubeSolvingAlgorithm algorithm)
+    {
+        Solver = algorithm.Solver();
+    }
+
+}

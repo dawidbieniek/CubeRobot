@@ -9,6 +9,7 @@ public interface IRobot
     public event RobotStateChangedEventHandler RobotStateChanged;
     public event CommandQueueChangedEventHandler CommandQueueChanged;
     public event MoveQueueChangedEventHandler MoveQueueChanged;
+    public event RobotEffectorsStateChangedEventHandler RobotEffectorsStateChanged;
 
     public RobotState CurrentState { get; }
 

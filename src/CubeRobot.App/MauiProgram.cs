@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
 namespace CubeRobot.App;
+
 public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
@@ -16,9 +17,11 @@ public static class MauiProgram
         builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-		builder.Services.AddBlazorWebViewDeveloperTools();
-		builder.Logging.AddDebug();
+        builder.Services.AddBlazorWebViewDeveloperTools();
+        builder.Logging.AddDebug();
 #endif
+
+        builder.Services.RegisterServices();
 
         return builder.Build();
     }

@@ -1,0 +1,32 @@
+﻿@page "/cube-input"
+
+<div class="container-fluid">
+    <div class="form-group">
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#configTab" role="tab">Konfiguracja</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#uploadTab" role="tab">Zdjęcia</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#appTab" role="tab">Aplikacja</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="configTab" class="tab-pane fade show active" role="tabpanel">
+                <label for="textInput">Enter Text:</label>
+                <input type="text" id="textInput" class="form-control" placeholder="Enter text here" />
+            </div>
+            <div id="uploadTab" class="tab-pane fade" role="tabpanel">
+                <ImageUpload />
+            </div>
+            <div id="appTab" class="tab-pane fade" role="tabpanel">
+                <ImageUpload />
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,4 +1,6 @@
-﻿namespace CubeRobot.Models.RubiksCube;
+﻿using System.ComponentModel;
+
+namespace CubeRobot.Models.RubiksCube;
 
 // Move coding 0x<faceNumber><moveType><moveDirection>
 // moveType: face (0), slice (1), rotation (2)
@@ -11,43 +13,55 @@ public enum CubeMove
 {
     // Face moves
     F = 0x000,
+    [Description("F\'")]
     FPrime = 0x001,
     F2 = 0x002,
     R = 0x100,
+    [Description("R\'")]
     RPrime = 0x101,
     R2 = 0x102,
     U = 0x200,
+    [Description("U\'")]
     UPrime = 0x201,
     U2 = 0x202,
     B = 0x300,
+    [Description("B\'")]
     BPrime = 0x301,
     B2 = 0x302,
     L = 0x400,
+    [Description("L\'")]
     LPrime = 0x401,
     L2 = 0x402,
     D = 0x500,
+    [Description("D\'")]
     DPrime = 0x501,
     D2 = 0x502,
 
     // Slice moves
     M = 0x010,
+    [Description("M\'")]
     MPrime = 0x011,
     M2 = 0x012,
     E = 0x110,
+    [Description("E\'")]
     EPrime = 0x111,
     E2 = 0x112,
     S = 0x210,
+    [Description("S\'")]
     SPrime = 0x211,
     S2 = 0x212,
 
     // Cube rotations
     X = 0x020,
+    [Description("X\'")]
     XPrime = 0x021,
     X2 = 0x022,
     Y = 0x120,
+    [Description("Y\'")]
     YPrime = 0x121,
     Y2 = 0x122,
     Z = 0x220,
+    [Description("Z\'")]
     ZPrime = 0x221,
     Z2 = 0x222
 }

@@ -1,0 +1,42 @@
+﻿@using System.ComponentModel
+@using CubeRobot.Models.RubiksCube
+
+<div class="form-group">
+    <label for="modeSelect">Podgląd kostki</label>
+    <InputSelect @bind-Value="_selectedPreviewMode" id="modeSelect" class="form-control">
+        @foreach (PreviewMode mode in Enum.GetValues(typeof(PreviewMode)))
+        {
+            <option value="@mode">@mode.GetDescriptor()</option>
+        }
+    </InputSelect>
+</div>
+<div class="mt-2">
+    @switch (_selectedPreviewMode)
+    {
+        case PreviewMode.Net:
+            <CubeNetDisplay Cube="Cube"/>
+            break;
+        default:
+            <!-- Placeholder for 2D/3D Preview -->
+            <div class="cube-preview border" style="height: 300px;"></div>
+            break;
+
+    }
+</div>
+
+@code 
+{
+    [Parameter, EditorRequired]
+    public Cube Cube { get; set; } = null!;
+
+    private PreviewMode _selectedPreviewMode = PreviewMode.Net;
+
+    private enum PreviewMode
+    {
+        [Description("Siatka")]
+        Net,
+        [Description("3D")]
+        Cube
+    }
+
+}

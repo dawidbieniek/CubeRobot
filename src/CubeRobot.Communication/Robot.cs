@@ -16,17 +16,13 @@ public class Robot : IRobot
         add => _stateManager.RobotStateChanged += value;
         remove => _stateManager.RobotStateChanged -= value;
     }
-    public event CommandQueueChangedEventHandler CommandQueueChanged
+    public event RobotEffectorsStateChangedEventHandler RobotEffectorsStateChanged
     {
-        add => (_communicator ?? throw new InvalidOperationException("Communication channel must be first configured")).CommandQueueChanged += value;
-        remove => (_communicator ?? throw new InvalidOperationException("Communication channel must be first configured")).CommandQueueChanged -= value;
+        add => _moveProcessor.RobotEffectorsStateChanged += value;
+        remove => _moveProcessor.RobotEffectorsStateChanged -= value;
     }
-    public event MoveQueueChangedEventHandler MoveQueueChanged
-    {
-        add => (_communicator ?? throw new InvalidOperationException("Communication channel must be first configured")).MoveQueueChanged += value;
-        remove => (_communicator ?? throw new InvalidOperationException("Communication channel must be first configured")).MoveQueueChanged -= value;
-    }
-
+    public event CommandQueueChangedEventHandler CommandQueueChanged = delegate { };
+    public event MoveQueueChangedEventHandler MoveQueueChanged = delegate { };
     public RobotState CurrentState
     {
         get => _stateManager.CurrentState;
@@ -37,6 +33,8 @@ public class Robot : IRobot
     {
         _communicator?.Dispose();
         _communicator = new(channel);
+        _communicator.MoveQueueChanged += MoveQueueChanged;
+        _communicator.CommandQueueChanged += CommandQueueChanged;
 
         CurrentState = RobotState.NoCube;
     }

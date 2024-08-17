@@ -1,17 +1,36 @@
-﻿@inherits LayoutComponentBase
+﻿@using CubeRobot.App.Components.Common
+
+@inherits LayoutComponentBase
+@implements IErrorDisplay
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
+        <article style="padding:0 !important;">
+            <CascadingValue Value="this" TValue="IErrorDisplay">
+                @Body
+            </CascadingValue>
         </article>
+        <!-- Error Display Section -->
+        <div class="container-fluid">
+            <div class="col-md-12">
+                @foreach (string error in _errors)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @error
+                    </div>
+                }
+            </div>
+        </div>
     </main>
 </div>
+
+@code
+{
+    private List<string> _errors = [];
+
+    public void AddErrors(params string[] errors)
+    {
+        _errors.AddRange(errors);
+        StateHasChanged();
+    }
+}
