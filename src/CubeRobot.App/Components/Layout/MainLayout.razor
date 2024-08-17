@@ -13,10 +13,11 @@
         <!-- Error Display Section -->
         <div class="container-fluid">
             <div class="col-md-12">
-                @foreach (string error in _errors)
+                @foreach(string error in _errors)
                 {
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         @error
+                        <button @onclick="() => DismissError(error)" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
             </div>
@@ -32,5 +33,10 @@
     {
         _errors.AddRange(errors);
         StateHasChanged();
+    }
+
+    private void DismissError(string error)
+    {
+        _errors.Remove(error);
     }
 }
