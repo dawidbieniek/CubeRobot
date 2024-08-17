@@ -22,7 +22,7 @@ public static class CubeFaceColorExtensions
         CubeFaceColor.Yellow => 'B',
         CubeFaceColor.Red => 'L',
         CubeFaceColor.Blue => 'D',
-        _ => throw new ArgumentOutOfRangeException(nameof(color), $"Invalid {nameof(CubeFaceColor)}"),
+        _ => throw new ArgumentOutOfRangeException(nameof(color), $"Invalid CubeFaceColor - {color}"),
     };
 
     public static CubeFaceColor FromFaceChar(char faceChar) => faceChar switch
@@ -34,6 +34,6 @@ public static class CubeFaceColorExtensions
         'B' => CubeFaceColor.Yellow,
         'L' => CubeFaceColor.Red,
         'D' => CubeFaceColor.Blue,
-        _ => throw new ArgumentException($"Invalid face character '{faceChar}'", nameof(faceChar)),
+        _ => throw new ArgumentException($"Invalid face character '{faceChar}'"),
     };
 }

@@ -11,7 +11,7 @@ public class Cube
 
     private readonly CubeFaceColor[][,] _blocks;
 
-    public Cube(int size, bool initializeColors = false)
+    public Cube(int size = 3, bool initializeColors = false)
     {
         Size = size;
         _blocks = Enumerable.Range(0, NumberOfFaces).Select(_ => new CubeFaceColor[Size, Size]).ToArray();
@@ -49,24 +49,19 @@ public class Cube
 
     public CubeFaceColor[,] this[CubeFace face] => _blocks[(int)face];
 
-    public static Cube FromConfigurationString(string configuration)
+    public static Cube FromConfigurationString(string configuration, int cubeSize = 3)
     {
-        int blocksInFace = (configuration.Length / NumberOfFaces);
-        double apparentSize = Math.Sqrt(blocksInFace);
+        if (configuration.Length != NumberOfFaces * cubeSize * cubeSize)
+            throw new ArgumentException($"Configuration have incorrect length: {configuration.Length} (should be {NumberOfFaces * cubeSize * cubeSize})");
 
-        if (apparentSize % 1 != 0)
-            throw new ArgumentException($"Configuration have incorrect length: {configuration.Length} (should be {NumberOfFaces} * <size> * <size>)");
-
-        int size = (int)Math.Truncate(apparentSize);    // There is no way someone will put configuration longer than int.MaxValue
-
-        Cube cube = new(size);
+        Cube cube = new(cubeSize);
 
         int i = 0;
         foreach (CubeFace face in CubeFaceStringConvertOrder)
         {
-            for (int y = 0; y < size; y++)
+            for (int y = 0; y < cubeSize; y++)
             {
-                for (int x = 0; x < size; x++)
+                for (int x = 0; x < cubeSize; x++)
                 {
                     CubeFaceColor color = CubeFaceColorExtensions.FromFaceChar(configuration[i++]);
                     cube._blocks[(int)face][y, x] = color;

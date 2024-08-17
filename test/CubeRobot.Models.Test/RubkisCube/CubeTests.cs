@@ -54,7 +54,7 @@ public class CubeTests
     [DataRow("RUUFUUFFFUBBRRRUBUDRRDFDRRRBBBDDDBBLDLLFLLDFDLLFUBUFLL")]
     public void FromConfigurationString_ReturnsCorrectCube_ForCorrectInput(string cubeConfig)
     {
-        Cube cube = Cube.FromConfigurationString(cubeConfig);
+        Cube cube = Cube.FromConfigurationString(cubeConfig, 3);
         string createdCubeConfig = cube.ToString();
 
         Assert.AreEqual(cubeConfig, createdCubeConfig);
@@ -66,6 +66,6 @@ public class CubeTests
     [DataRow("UUUUUULLLURRURRURRFFFFFFFFFRRRDDDDDDLLDLLDLLDBBBBBBB")]   // Wrong length
     public void FromConfigurationString_ThrowsException_ForInvalidConfig(string cubeConfig)
     {
-        Cube.FromConfigurationString(cubeConfig);
+        Cube.FromConfigurationString(cubeConfig, 3);
     }
 }
