@@ -90,7 +90,7 @@ public class RobotCommunicatorTests
 
         // Assert
         CollectionAssert.AreEqual(addedRobotMoves, _communicationChannel.LastMovesSent);
-        Assert.Equals(0, _communicationChannel.LastMovesSent.Intersect(initialRobotMoves).Count());
+        Assert.AreEqual(0, _communicationChannel.LastMovesSent.Intersect(initialRobotMoves).Count());
     }
 
     [TestMethod]
@@ -109,7 +109,7 @@ public class RobotCommunicatorTests
         FieldInfo moveQueueField = typeof(RobotCommunicator).GetField("_cubeMovesLeft", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new Exception();
         Queue<MutablePair<CubeMove, int>> moveQueue = moveQueueField.GetValue(_robotCommunicator) as Queue<MutablePair<CubeMove, int>> ?? throw new Exception(); ;
         MutablePair<CubeMove, int> firstMove = moveQueue.Peek();
-        Assert.Equals(1, firstMove.Item2);
+        Assert.AreEqual(1, firstMove.Item2);
     }
 
     [TestMethod]
@@ -126,7 +126,7 @@ public class RobotCommunicatorTests
         FieldInfo moveQueueField = typeof(RobotCommunicator).GetField("_cubeMovesLeft", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new Exception();
         Queue<MutablePair<CubeMove, int>> moveQueue = moveQueueField.GetValue(_robotCommunicator) as Queue<MutablePair<CubeMove, int>> ?? throw new Exception(); ;
         MutablePair<CubeMove, int> firstMove = moveQueue.Peek();
-        Assert.Equals(2, firstMove.Item2);
+        Assert.AreEqual(2, firstMove.Item2);
     }
 
     [TestMethod]
@@ -143,8 +143,8 @@ public class RobotCommunicatorTests
         FieldInfo moveQueueField = typeof(RobotCommunicator).GetField("_cubeMovesLeft", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new Exception();
         Queue<MutablePair<CubeMove, int>> moveQueue = moveQueueField.GetValue(_robotCommunicator) as Queue<MutablePair<CubeMove, int>> ?? throw new Exception(); ;
         MutablePair<CubeMove, int> firstMove = moveQueue.Peek();
-        Assert.Equals(initialCubeMoves[1].Item1, firstMove.Item1);
-        Assert.Equals(initialCubeMoves[1].Item2, firstMove.Item2);
+        Assert.AreEqual(initialCubeMoves[1].Item1, firstMove.Item1);
+        Assert.AreEqual(initialCubeMoves[1].Item2, firstMove.Item2);
     }
 
     [TestMethod]

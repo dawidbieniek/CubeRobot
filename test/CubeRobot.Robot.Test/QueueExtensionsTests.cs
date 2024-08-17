@@ -51,7 +51,8 @@ public class QueueExtensionsTests
 
         List<int> dequeuedItems = _queue.DequeueUntilEncountered(target);
 
-        Assert.AreEqual([1, 2], dequeuedItems); // Returned list shouldn't contain the target element
+        List<int> expectedDequeued = [1, 2, target];
+        CollectionAssert.AreEqual(expectedDequeued, dequeuedItems); // Returned list shouldn't contain the target element
         Assert.AreEqual(1, _queue.Count); // Only '4' should remain in the queue
     }
 
@@ -65,7 +66,8 @@ public class QueueExtensionsTests
 
         List<int> dequeuedItems = _queue.DequeueUntilEncountered(target);
 
-        Assert.AreEqual([1, 2, 3], dequeuedItems);
+        List<int> expectedDequeued = [1, 2, 3];
+        CollectionAssert.AreEqual(expectedDequeued, dequeuedItems);
         Assert.AreEqual(0, _queue.Count); // Queue should be empty
     }
 

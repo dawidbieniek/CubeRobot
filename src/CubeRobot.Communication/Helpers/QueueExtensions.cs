@@ -15,8 +15,7 @@ public static class QueueExtensions
 
     /// <summary>
     /// Removes elements from the front of the queue until the specified element is encountered,
-    /// then returns the dequeued elements as a list. <b> The specified element will also be
-    /// removed, but not added to the list </b>
+    /// then returns the dequeued elements as a list. <b> The specified element will also be removed </b>
     /// </summary>
     /// <param name="queue"> The queue from which elements will be removed. </param>
     /// <param name="target"> The target element to stop dequeuing at. </param>
