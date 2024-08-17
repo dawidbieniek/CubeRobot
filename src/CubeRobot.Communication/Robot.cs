@@ -16,6 +16,11 @@ public class Robot : IRobot
         add => _stateManager.RobotStateChanged += value;
         remove => _stateManager.RobotStateChanged -= value;
     }
+    public event RobotEffectorsStateChangedEventHandler RobotEffectorsStateChanged
+    {
+        add => _moveProcessor.RobotEffectorsStateChanged += value;
+        remove => _moveProcessor.RobotEffectorsStateChanged -= value;
+    }
     public event CommandQueueChangedEventHandler CommandQueueChanged = delegate { };
     public event MoveQueueChangedEventHandler MoveQueueChanged = delegate { };
     public RobotState CurrentState

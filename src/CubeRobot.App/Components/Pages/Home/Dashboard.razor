@@ -60,41 +60,43 @@
 
             <!-- State Section -->
             <div class="card mb-4">
-                <div class="card-body">
-                    <p class="mb-2">Current Robot State: Idle</p>
+                <div class="card-body">                   
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Position</th>
-                                <th scope="col">Arm State</th>
-                                <th scope="col">Rotor State</th>
+                                <th scope="col"></th>
+                                <th scope="col">Stan ramienia</th>
+                                <th scope="col">Stan rotora</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Front</td>
-                                <td>Arm 1 State</td>
-                                <td>Rotor 1 State</td>
+                                <td>Przód</td>
+                                <td>@_robotMovers[0].GetDescriptor()</td>
+                                <td>@_robotRotors[0].GetDescriptor()</td>
                             </tr>
                             <tr>
-                                <td>Left</td>
-                                <td>Arm 2 State</td>
-                                <td>Rotor 2 State</td>
+                                <td>Lewo</td>
+                                <td>@_robotMovers[1].GetDescriptor()</td>
+                                <td>@_robotRotors[1].GetDescriptor()</td>
                             </tr>
                             <tr>
-                                <td>Right</td>
-                                <td>Arm 3 State</td>
-                                <td>Rotor 3 State</td>
+                                <td>Prawo</td>
+                                <td>@_robotMovers[2].GetDescriptor()</td>
+                                <td>@_robotRotors[2].GetDescriptor()</td>
                             </tr>
                             <tr>
-                                <td>Back</td>
-                                <td>Arm 4 State</td>
-                                <td>Rotor 4 State</td>
+                                <td>Tył</td>
+                                <td>@_robotMovers[3].GetDescriptor()</td>
+                                <td>@_robotRotors[3].GetDescriptor()</td>
                             </tr>
                         </tbody>
                     </table>
-                    <div class="d-flex justify-content-end mt-3">
-                        <RobotControllButtonPanel RobotState="Robot.CurrentState"/> @* TODO: Check if component get parameter update upon robot state change *@
+                    <div class="d-flex justify-content-between mt-3">
+                        <h4>Stan robota: <span class="badge rounded-pill bg-primary">@_robotState.GetDescriptor()</span></h4>
+                        <div>
+                            <RobotControllButtonPanel RobotState="Robot.CurrentState"/> @* TODO: Check if component get parameter update upon robot state change *@
+                        </div>
                     </div>
                 </div>
             </div>
@@ -126,11 +128,17 @@
     private List<CubeMove> _moveQueue = [];
     private CubeMoveProgressQueue _cubeMoveProgressQueue = null!; // Reference
 
+    private RobotState _robotState = RobotState.Disconnected;
+    private RotorState[] _robotRotors = Enumerable.Repeat(RotorState.Unknown, 4).ToArray();
+    private MoverState[] _robotMovers = Enumerable.Repeat(MoverState.Unknown, 4).ToArray();
+
     private IEnumerable<string> _errors = ["test error", "test error2"];
 
     protected override void OnInitialized()
     {
+        Robot.RobotStateChanged += (s, e) => _robotState = e.CurrentState;
         Robot.MoveQueueChanged += OnRobotMoveQueueChanged;
+        Robot.RobotEffectorsStateChanged += OnRobotEffectorsStateChanged;
     }
 
     private void OnRobotMoveQueueChanged(object sender, MoveQueueEventArgs e)
@@ -147,6 +155,14 @@
             _commandQueue = [.. e.RemainingCommands];
         else
             _robotMoveProgressQueue.AdvanceProgress(e.RemainingCommands.Count());
+    }
+
+    private void OnRobotEffectorsStateChanged(object sender, RobotEffectorsEventArgs e)
+    {
+        _robotRotors = e.RotorStates;
+        _robotMovers = e.MoverStates;
+
+        // TODO: StatehasChanged??
     }
 
     private void ChangeSelectedPort(string portName)

@@ -1,14 +1,24 @@
-﻿namespace CubeRobot.Robot;
+﻿using System.ComponentModel;
 
-internal enum RotorState
+namespace CubeRobot.Robot;
+
+public enum RotorState
 {
+    [Description("Nieznany")]
+    Unknown,
+    [Description("Poziomy")]
     Horizontal,
+    [Description("Pionowy")]
     Vertical
 }
 
-internal enum MoverState
+public enum MoverState
 {
+    [Description("Nieznany")]
+    Unknown,
+    [Description("Bliski")]
     Close,
+    [Description("Daleki")]
     Far
 }
 
