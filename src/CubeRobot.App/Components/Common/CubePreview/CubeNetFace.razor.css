@@ -2,6 +2,9 @@
     --sticker-size: 20px;
     --face-size: calc((var(--sticker-size)) * var(--sticker-col-count));
     width: var(--face-size);
+    display: grid;
+    grid-template-columns: repeat(var(--sticker-col-count), var(--sticker-size));
+    grid-template-rows: repeat(var(--sticker-col-count), var(--sticker-size));
 }
 
 .face-offset {

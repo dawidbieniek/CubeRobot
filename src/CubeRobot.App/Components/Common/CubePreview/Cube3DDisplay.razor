@@ -1,0 +1,16 @@
+﻿@using CubeRobot.Models.RubiksCube
+
+<div class="container bg-danger">
+    <CubeNetFace HorizontalOffset="true" Stickers="Cube[CubeFace.Up]"/>
+    <CubeNetFace Stickers="Cube[CubeFace.Left]" />
+    <CubeNetFace Stickers="Cube[CubeFace.Front]" />
+    <CubeNetFace Stickers="Cube[CubeFace.Right]" />
+    <CubeNetFace Stickers="Cube[CubeFace.Back]" />
+    <CubeNetFace HorizontalOffset="true" Stickers="Cube[CubeFace.Down]" />
+</div>
+
+@code
+{
+    [Parameter, EditorRequired]
+    public Cube Cube { get; set; } = null!;
+}

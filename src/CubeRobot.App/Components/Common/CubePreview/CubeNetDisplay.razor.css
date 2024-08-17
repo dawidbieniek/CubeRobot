@@ -1,1 +1,19 @@
-﻿
+﻿.cube-container {
+    --sticker-size: 20px;
+    --face-size: calc(var(--sticker-size) * 3);
+    display: grid;
+    grid-template-columns: repeat(4, var(--face-size));
+    grid-template-rows: repeat(3, var(--face-size));
+}
+
+    .cube-container > :first-child {
+        grid-column-start: 2;
+    }
+
+    .cube-container > :nth-child(2) {
+        grid-column-start: 1;
+    }
+
+    .cube-container > :last-child {
+        grid-column-start: 2;
+    }
