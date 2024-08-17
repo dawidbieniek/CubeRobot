@@ -48,4 +48,24 @@ public class CubeTests
 
         Assert.AreEqual(expectedConfiguration, _cube.ToString());
     }
+
+    [TestMethod]
+    [DataRow("UUUBUBUDFLRFRRBLRFLFUFFDLDDDLFLDUDBDBUBULRBFBRFRLBLRDR")]
+    [DataRow("RUUFUUFFFUBBRRRUBUDRRDFDRRRBBBDDDBBLDLLFLLDFDLLFUBUFLL")]
+    public void FromConfigurationString_ReturnsCorrectCube_ForCorrectInput(string cubeConfig)
+    {
+        Cube cube = Cube.FromConfigurationString(cubeConfig);
+        string createdCubeConfig = cube.ToString();
+
+        Assert.AreEqual(cubeConfig, createdCubeConfig);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    [DataRow("UUUABUBUDFLRFRRBLRFLFUFFDLDDDLFLDUDBDBUBULRFBRFRLBLRDR")] // Unrecognized char
+    [DataRow("UUUUUULLLURRURRURRFFFFFFFFFRRRDDDDDDLLDLLDLLDBBBBBBB")]   // Wrong length
+    public void FromConfigurationString_ThrowsException_ForInvalidConfig(string cubeConfig)
+    {
+        Cube.FromConfigurationString(cubeConfig);
+    }
 }

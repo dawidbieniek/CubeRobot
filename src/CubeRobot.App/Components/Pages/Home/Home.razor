@@ -1,6 +1,5 @@
 ﻿@page "/"
 
-@using CubeRobot.App.Components.Pages.Home.CubePreview
 @using CubeRobot.App.Components.Pages.Home.ProgressQueue;
 @using CubeRobot.Models.RubiksCube
 @using CubeRobot.Robot
@@ -131,8 +130,6 @@
         Robot.RobotStateChanged += (s, e) => _robotState = e.CurrentState;
         Robot.MoveQueueChanged += OnRobotMoveQueueChanged;
         Robot.RobotEffectorsStateChanged += OnRobotEffectorsStateChanged;
-
-        ErrorDisplay.AddErrors("Test error");
     }
 
     private void OnRobotMoveQueueChanged(object sender, MoveQueueEventArgs e)

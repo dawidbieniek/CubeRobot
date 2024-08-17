@@ -5,6 +5,7 @@ namespace CubeRobot.Models.RubiksCube;
 public class Cube
 {
     public const int NumberOfFaces = 6;
+    private static readonly CubeFace[] CubeFaceStringConvertOrder = [CubeFace.Up, CubeFace.Right, CubeFace.Front, CubeFace.Down, CubeFace.Left, CubeFace.Back];
 
     private readonly CubeRotationHelper _rotationHelper;
 
@@ -48,6 +49,34 @@ public class Cube
 
     public CubeFaceColor[,] this[CubeFace face] => _blocks[(int)face];
 
+    public static Cube FromConfigurationString(string configuration)
+    {
+        int blocksInFace = (configuration.Length / NumberOfFaces);
+        double apparentSize = Math.Sqrt(blocksInFace);
+
+        if (apparentSize % 1 != 0)
+            throw new ArgumentException($"Configuration have incorrect length: {configuration.Length} (should be {NumberOfFaces} * <size> * <size>)");
+
+        int size = (int)Math.Truncate(apparentSize);    // There is no way someone will put configuration longer than int.MaxValue
+
+        Cube cube = new(size);
+
+        int i = 0;
+        foreach (CubeFace face in CubeFaceStringConvertOrder)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    CubeFaceColor color = CubeFaceColorExtensions.FromFaceChar(configuration[i++]);
+                    cube._blocks[(int)face][y, x] = color;
+                }
+            }
+        }
+
+        return cube;
+    }
+
     public void PerformMove(CubeMove move)
     {
         switch (move.MoveType())
@@ -86,9 +115,7 @@ public class Cube
     {
         StringBuilder sb = new();
 
-        CubeFace[] facesOrder = [CubeFace.Up, CubeFace.Right, CubeFace.Front, CubeFace.Down, CubeFace.Left, CubeFace.Back];
-
-        foreach (CubeFace face in facesOrder)
+        foreach (CubeFace face in CubeFaceStringConvertOrder)
         {
             for (int y = 0; y < Size; y++)
             {
