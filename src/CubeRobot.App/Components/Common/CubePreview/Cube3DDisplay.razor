@@ -1,16 +1,32 @@
 ﻿@using CubeRobot.Models.RubiksCube
 
-<div class="container bg-danger">
-    <CubeNetFace HorizontalOffset="true" Stickers="Cube[CubeFace.Up]"/>
-    <CubeNetFace Stickers="Cube[CubeFace.Left]" />
-    <CubeNetFace Stickers="Cube[CubeFace.Front]" />
-    <CubeNetFace Stickers="Cube[CubeFace.Right]" />
-    <CubeNetFace Stickers="Cube[CubeFace.Back]" />
-    <CubeNetFace HorizontalOffset="true" Stickers="Cube[CubeFace.Down]" />
+<div class="scene bg-light d-flex justify-content-center" style="--sticker-size:@(_stickerSize)px">
+    <div class="cube">
+        <div class="cube-up">
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Up]" />
+        </div>
+        <div class="cube-left">
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Left]" />
+        </div>
+        <div class="cube-front">
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Front]" />
+        </div>
+        <div class="cube-right">
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Right]" />
+        </div>
+        <div class="cube-back">
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Back]" />
+        </div>
+        <div class="cube-down">
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Down]" />
+        </div>
+    </div>
 </div>
 
 @code
 {
     [Parameter, EditorRequired]
     public Cube Cube { get; set; } = null!;
+
+    private const int _stickerSize = 40;
 }
