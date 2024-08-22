@@ -1,35 +1,26 @@
 ﻿.scene {
     --face-size: calc(var(--sticker-size) * 3);
     --half-face-size: calc(var(--face-size) * 0.5);
-    padding-top: var(--half-face-size);
-    padding-bottom: var(--half-face-size);
+    overflow: hidden;
 }
 
 .cube {
     position: relative;
+    margin-top: var(--half-face-size);
+    margin-bottom: var(--half-face-size);
     transform-style: preserve-3d;
     height: var(--face-size);
     width: var(--face-size);
-    transform: translateZ(-100px);
-    animation: rotate 3s linear infinite;
+    transform: rotateX(var(--vertical-rotation)) rotateY(var(--horizontal-rotation));
+    transition: transform 0.5s;
 }
 
     .cube div {
         position: absolute;
     }
 
-@keyframes rotate {
-    from {
-        transform: rotateY(0) rotateX(0);
-    }
-
-    to {
-        transform: rotateY(360deg) rotateX(360deg);
-    }
-}
-
 .cube-up {
-    transform: rotateX( 90deg) translateZ(var(--half-face-size));
+    transform: rotateX(90deg) translateZ(var(--half-face-size));
 }
 
 .cube-left {
@@ -37,11 +28,11 @@
 }
 
 .cube-front {
-    transform: rotateY( 0deg) translateZ(var(--half-face-size));
+    transform: rotateY(0deg) translateZ(var(--half-face-size));
 }
 
 .cube-right {
-    transform: rotateY( 90deg) translateZ(var(--half-face-size));
+    transform: rotateY(90deg) translateZ(var(--half-face-size));
 }
 
 .cube-down {
@@ -50,4 +41,20 @@
 
 .cube-back {
     transform: rotateY(180deg) translateZ(var(--half-face-size));
+}
+
+.horizontal-slider {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+}
+
+.vertical-slider {
+    position: absolute;
+    right: 10px;
+    writing-mode: vertical-lr;
+    direction:rtl;
+    height: 80%;
 }

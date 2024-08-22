@@ -1,23 +1,25 @@
 ﻿@using CubeRobot.Models.RubiksCube
 
-<div class="cube-container bg-danger" style="--sticker-size:@(_stickerSize)px">
-    <div>
-        <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Up]" />
-    </div>
-    <div>
-        <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Left]" />
-    </div>
-    <div>
-        <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Front]" />
-    </div>
-    <div>
-        <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Right]" />
-    </div>
-    <div>
-        <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Back]" />
-    </div>
-    <div>
-        <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Down]" />
+<div class="bg-light d-flex justify-content-center">
+    <div class="cube-container" style="--sticker-size:@(_stickerSize)px">
+        <div>
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Up]" />
+        </div>
+        <div>
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Left]" />
+        </div>
+        <div>
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Front]" />
+        </div>
+        <div>
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Right]" />
+        </div>
+        <div>
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Back]" />
+        </div>
+        <div>
+            <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Down]" />
+        </div>
     </div>
 </div>
 

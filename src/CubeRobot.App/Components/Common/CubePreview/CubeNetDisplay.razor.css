@@ -4,6 +4,8 @@
     display: grid;
     grid-template-columns: repeat(4, var(--face-size));
     grid-template-rows: repeat(3, var(--face-size));
+    width: calc(4*var(--face-size));
+    height: calc(3*var(--face-size));
 }
 
     .cube-container > :first-child {

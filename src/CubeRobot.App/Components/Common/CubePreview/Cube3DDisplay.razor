@@ -1,7 +1,7 @@
 ﻿@using CubeRobot.Models.RubiksCube
 
-<div class="scene bg-light d-flex justify-content-center" style="--sticker-size:@(_stickerSize)px">
-    <div class="cube">
+<div class="scene bg-light d-flex justify-content-center align-items-center position-relative" style="--sticker-size:@(_stickerSize)px">
+    <div class="cube" style="--vertical-rotation:@(-_vRotation)deg; --horizontal-rotation:@(-_hRotation)deg;">
         <div class="cube-up">
             <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Up]" />
         </div>
@@ -21,12 +21,18 @@
             <CubeNetFace StickerSize="@_stickerSize" Stickers="Cube[CubeFace.Down]" />
         </div>
     </div>
+    <input type="range" min="-90" max="90" class="vertical-slider" @bind-value="_vRotation" @bind-value:event="oninput">
+    <input type="range" min="-180" max="180" class="horizontal-slider" @bind-value="_hRotation" @bind-value:event="oninput">
 </div>
+
 
 @code
 {
     [Parameter, EditorRequired]
     public Cube Cube { get; set; } = null!;
+
+    private int _hRotation = 0;
+    private int _vRotation = 0;
 
     private const int _stickerSize = 40;
 }
