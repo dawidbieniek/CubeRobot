@@ -1,46 +1,127 @@
-﻿<InputFile OnChange="HandleFileSelected" multiple />
+﻿<style>
+    .dropper {
+        --sticker-size: 40px;
+        --face-size: calc(var(--sticker-size) * 3);
+        display: grid;
+        grid-template-columns: repeat(4, var(--face-size));
+        grid-template-rows: repeat(3, var(--face-size));
+        width: calc(4*var(--face-size));
+        height: calc(3*var(--face-size));
+    }
+
+        .dropper div {
+            border: 4px solid magenta;
+        }
+
+        .dropper > :first-child {
+            grid-column-start: 2;
+        }
+
+        .dropper > :nth-child(2) {
+            grid-column-start: 1;
+        }
+
+        .dropper > :last-child {
+            grid-column-start: 2;
+        }
+</style>
 
 <div class="row mt-3">
-    @foreach (var image in uploadedImages)
+    @foreach (ImageFile image in _uploadedImages)
     {
-        <div class="col-md-4">
+        <div class="col-md-2">
             <div class="card">
-                <img src="@image.Preview" class="card-img-top" alt="@image.FileName" />
-                <div class="card-body">
-                    <h5 class="card-title">@image.FileName</h5>
+                <div class="card-header">
+                    @image.FileName
+                    <button @onclick="() => RemoveImage(image)" class="btn-close position-absolute end-0" style="top:8px !important;"></button>
                 </div>
+                <img src="@image.Preview" class="card-img-bottom" alt="@image.FileName" />
+            </div>
+        </div>
+    }
+    @* Upload button *@
+    @if (_uploadedImages.Count < MaxFileCount)
+    {
+        <div class="col-md-2">
+            <div class="card">
+                <InputFile OnChange="UploadFiles" multiple accept="image/*"></InputFile>
             </div>
         </div>
     }
 </div>
+<div class="row">
+    <div class="dropper">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
 
-@code {
-    private List<ImageFile> uploadedImages = new List<ImageFile>();
+@code
+{
+    private const int MaxFileNameLength = 12;
+    private const int MaxFileCount = 12;
 
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    [CascadingParameter]
+    private IErrorDisplay ErrorDisplay { get; set; } = null!;
+
+    private List<ImageFile> _uploadedImages = [];
+
+    private async Task UploadFiles(InputFileChangeEventArgs e)
     {
-        foreach (var file in e.GetMultipleFiles())
+        try
         {
-            var image = new ImageFile
+            foreach (IBrowserFile file in e.GetMultipleFiles(MaxFileCount))
+            {
+                if (_uploadedImages.Count >= MaxFileCount)
                 {
-                    FileName = file.Name,
-                    Preview = await LoadImagePreview(file)
-                };
-            uploadedImages.Add(image);
+                    ErrorDisplay.AddErrors($"Can't upload more than {MaxFileCount} files");
+                    return;
+                }
+                if (!file.ContentType.StartsWith("image"))
+                {
+                    ErrorDisplay.AddErrors($"Unsupported file type: {file.ContentType}");
+                    return;
+                }
+
+                ImageFile image = new(ShortenFileName(file.Name), await LoadImagePreview(file));
+                _uploadedImages.Add(image);
+            }
         }
+        catch (InvalidOperationException)
+        {
+            ErrorDisplay.AddErrors($"Can't upload more than {MaxFileCount} files");
+        }
+
+    }
+
+    private string ShortenFileName(string fileName)
+    {
+        string nameWithoutExtension = fileName.Split('.')[0];
+        return nameWithoutExtension[0..Math.Min(nameWithoutExtension.Length, MaxFileNameLength)];
     }
 
     private async Task<string> LoadImagePreview(IBrowserFile file)
     {
-        var buffer = new byte[file.Size];
+        byte[] buffer = new byte[file.Size];
         await file.OpenReadStream().ReadAsync(buffer);
-        var imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+
+        string imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
         return imageDataUrl;
     }
 
-    private class ImageFile
+    private void RemoveImage(ImageFile image)
     {
-        public string FileName { get; set; }
-        public string Preview { get; set; }
+        _uploadedImages.Remove(image);
     }
+
+    private void ShowUploadDialog()
+    {
+
+    }
+
+    private record ImageFile(string FileName, string Preview);
 }
