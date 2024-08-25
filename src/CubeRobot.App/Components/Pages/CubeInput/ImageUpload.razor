@@ -1,10 +1,12 @@
 ﻿@using BlazorSortableList
 @using CubeRobot.App.Components.Pages.CubeInput.ImageDrop
 
-<div class="row mt-2">
     @* Upload button *@
-    <InputFile OnChange="UploadFiles" multiple accept="image/*"></InputFile>
- </div>
+<label for="filePicker" class="btn btn-primary mt-2">
+    <span class="title">Prześlij obrazy</span>
+    <InputFile id="filePicker" OnChange="UploadFiles" multiple accept="image/*" class="invisible" style="width:0px;"></InputFile>
+</label>
+    
 <div class="row-parent">
     <SortableList Id="@_group.UploadListId" GroupModel="_group" T="ImageFile" Style="min-height:100px; background-color:lightgray; border-radius:5px; overflow:hidden;">
         <SortableItemTemplate>
