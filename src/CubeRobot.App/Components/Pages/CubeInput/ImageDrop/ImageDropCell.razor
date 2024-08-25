@@ -1,0 +1,24 @@
+﻿@using BlazorSortableList
+@using CubeRobot.Models.RubiksCube
+
+<div class="cell-content">
+    <SortableList Id="@Group.GetFaceListId(Face)" GroupModel="Group" T="ImageFile" Style="height:100%;">
+        <SortableItemTemplate>
+            @* <div class="d-flex justify-content-center align-content-center h-100"> *@
+            <div style="width:100%; height:100%;">
+                <img src="@context.Preview" alt="@context.FileName" class="mh-100 mw-100" />
+            </div>
+        </SortableItemTemplate>
+    </SortableList>
+    <h2 class="text-muted" style="z-index:-1;">@BackgroundText</h2>
+</div>
+
+@code 
+{
+    [Parameter, EditorRequired]
+    public string BackgroundText { get; set; } = string.Empty;
+    [Parameter, EditorRequired]
+    public CubeFace Face { get; set; } = CubeFace.Up;
+    [Parameter, EditorRequired]
+    public CubeSortableListGroup Group { get; set; } = null!;
+}

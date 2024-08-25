@@ -1,74 +1,60 @@
-﻿<style>
-    .dropper {
-        --sticker-size: 40px;
-        --face-size: calc(var(--sticker-size) * 3);
-        display: grid;
-        grid-template-columns: repeat(4, var(--face-size));
-        grid-template-rows: repeat(3, var(--face-size));
-        width: calc(4*var(--face-size));
-        height: calc(3*var(--face-size));
-    }
+﻿@using BlazorSortableList
+@using CubeRobot.App.Components.Pages.CubeInput.ImageDrop
 
-        .dropper div {
-            border: 4px solid magenta;
-        }
-
-        .dropper > :first-child {
-            grid-column-start: 2;
-        }
-
-        .dropper > :nth-child(2) {
-            grid-column-start: 1;
-        }
-
-        .dropper > :last-child {
-            grid-column-start: 2;
-        }
-</style>
-
-<div class="row mt-3">
-    @foreach (ImageFile image in _uploadedImages)
-    {
-        <div class="col-md-2">
-            <div class="card">
-                <div class="card-header">
-                    @image.FileName
-                    <button @onclick="() => RemoveImage(image)" class="btn-close position-absolute end-0" style="top:8px !important;"></button>
-                </div>
-                <img src="@image.Preview" class="card-img-bottom" alt="@image.FileName" />
-            </div>
-        </div>
-    }
+<div class="row mt-2">
     @* Upload button *@
-    @if (_uploadedImages.Count < MaxFileCount)
-    {
-        <div class="col-md-2">
-            <div class="card">
-                <InputFile OnChange="UploadFiles" multiple accept="image/*"></InputFile>
+    <InputFile OnChange="UploadFiles" multiple accept="image/*"></InputFile>
+ </div>
+<div class="row-parent">
+    <SortableList Id="@_group.UploadListId" GroupModel="_group" T="ImageFile" Style="min-height:100px; background-color:lightgray; border-radius:5px; overflow:hidden;">
+        <SortableItemTemplate>
+            <div class="col-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        @context.FileName
+                        <button @onclick="() => RemoveImage(context)" class="btn-close position-absolute end-0  " style="top:8px !important;"></button>
+                    </div>
+                    <img src="@context.Preview" class="card-img-bottom" alt="@context.FileName" />
+                </div>
             </div>
-        </div>
-    }
+        </SortableItemTemplate>
+    </SortableList>
 </div>
-<div class="row">
-    <div class="dropper">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+
+<div class="row mt-2">
+    <div class="col-md-6">
+        <ImageDropCubeNet Group="_group"  />
     </div>
 </div>
+
 
 @code
 {
     private const int MaxFileNameLength = 12;
     private const int MaxFileCount = 12;
 
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = null!;
+
     [CascadingParameter]
     private IErrorDisplay ErrorDisplay { get; set; } = null!;
 
+    private CubeSortableListGroup _group = null!;
+
     private List<ImageFile> _uploadedImages = [];
+
+    protected override void OnInitialized()
+    {
+        _group = new(() => StateHasChanged(), _uploadedImages);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("replaceParentPlaceholderContainer", "row-parent", "row mx-0 mt-2 p-1");
+        }
+    }
 
     private async Task UploadFiles(InputFileChangeEventArgs e)
     {
@@ -122,6 +108,4 @@
     {
 
     }
-
-    private record ImageFile(string FileName, string Preview);
 }

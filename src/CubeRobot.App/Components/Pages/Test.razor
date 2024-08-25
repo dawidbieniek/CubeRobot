@@ -1,0 +1,50 @@
+﻿@inherits TestBase
+
+@page "/settings/robot"
+
+@using BlazorSortableList
+
+<style>
+    .cube-container {
+        --sticker-size: 20px;
+        --face-size: calc(var(--sticker-size) * 3);
+        display: grid;
+        grid-template-columns: repeat(4, var(--face-size));
+        grid-template-rows: repeat(3, var(--face-size));
+        width: calc(4*var(--face-size));
+        height: calc(3*var(--face-size));
+    }
+
+        .cube-container > :first-child {
+            grid-column-start: 2;
+        }
+
+        .cube-container > :nth-child(2) {
+            grid-column-start: 1;
+        }
+
+        .cube-container > :nth-child(6) {
+            grid-column-start: 2;
+        }
+</style>
+
+<div class="row-parent">
+    <SortableList GroupModel="_group" Items="items1" OnRemove="ListOneRemove">
+        <SortableItemTemplate>
+            <div class="col-md-2 d-flex justify-content-center align-content-center bg-warning">
+                @context
+            </div>
+        </SortableItemTemplate>
+    </SortableList>
+</div>
+
+
+<div class="grid-parent">
+    <SortableList GroupModel="_group" Items="items2" OnRemove="ListTwoRemove">
+        <SortableItemTemplate>
+            <div class="d-flex justify-content-center align-content-center bg-danger">
+                @context
+            </div>
+        </SortableItemTemplate>
+    </SortableList>
+</div>

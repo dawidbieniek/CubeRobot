@@ -1,0 +1,25 @@
+﻿.cross-grid {
+    display: grid;
+    grid-gap:10px;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+    .cross-grid > :first-child {
+        grid-column-start: 2;
+    }
+
+    .cross-grid > :nth-child(2) {
+        grid-column-start: 1;
+    }
+
+    .cross-grid > :nth-child(6) {
+        grid-column-start: 2;
+    }
+
+    .cross-grid > div {
+        padding-top:100%;
+        position:relative;
+        border: 2px solid black;
+        border-radius:5%;
+        overflow:hidden;
+    }

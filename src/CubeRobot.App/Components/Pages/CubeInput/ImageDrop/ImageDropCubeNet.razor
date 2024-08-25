@@ -1,0 +1,29 @@
+﻿@using BlazorSortableList
+@using CubeRobot.Models.RubiksCube
+
+<div class="cross-grid">
+    <div>
+        <ImageDropCell BackgroundText="Up" Face="CubeFace.Up" Group="Group" />
+    </div>
+    <div>
+        <ImageDropCell BackgroundText="Left" Face="CubeFace.Left" Group="Group" />
+    </div>
+    <div>
+        <ImageDropCell BackgroundText="Front" Face="CubeFace.Front" Group="Group" />
+    </div>
+    <div>
+        <ImageDropCell BackgroundText="Right" Face="CubeFace.Right" Group="Group" />
+    </div>
+    <div>
+        <ImageDropCell BackgroundText="Back" Face="CubeFace.Back" Group="Group" />
+    </div>
+    <div>
+        <ImageDropCell BackgroundText="Down" Face="CubeFace.Down" Group="Group" />
+    </div>
+</div>
+
+@code 
+{
+    [Parameter, EditorRequired]
+    public CubeSortableListGroup Group { get; set; } = null!;
+}
