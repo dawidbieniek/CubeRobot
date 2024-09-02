@@ -98,9 +98,16 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CubeRobot.Communication\CubeRobot.Robot.csproj" />
+      <ProjectReference Include="..\CubeRobot.CV\CubeRobot.CV.csproj" />
       <ProjectReference Include="..\CubeRobot.Models\CubeRobot.Models.csproj" />
       <ProjectReference Include="..\CubeRobot.Solvers\CubeRobot.Solvers.csproj" />
       <ProjectReference Include="..\CubeRobot.Util\CubeRobot.Util.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="Components\Pages\Test2.razor">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
     </ItemGroup>
 
 </Project>

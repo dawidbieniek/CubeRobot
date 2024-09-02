@@ -19,6 +19,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kociemba", "Kociemba\Kociem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.Util", "CubeRobot.Util\CubeRobot.Util.csproj", "{46232A00-AD5C-44CE-931C-C8D318B8ABE3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CubeRobot.CV", "CubeRobot.CV\CubeRobot.CV.csproj", "{8E7CDC84-4229-42A2-93C9-6F0F84DCB115}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeRobot.CV.Test", "..\test\CubeRobot.CV.Test\CubeRobot.CV.Test.csproj", "{C1143848-CAEE-475B-B071-F955AC84D823}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,14 @@ Global
 		{46232A00-AD5C-44CE-931C-C8D318B8ABE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46232A00-AD5C-44CE-931C-C8D318B8ABE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46232A00-AD5C-44CE-931C-C8D318B8ABE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E7CDC84-4229-42A2-93C9-6F0F84DCB115}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E7CDC84-4229-42A2-93C9-6F0F84DCB115}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E7CDC84-4229-42A2-93C9-6F0F84DCB115}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E7CDC84-4229-42A2-93C9-6F0F84DCB115}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1143848-CAEE-475B-B071-F955AC84D823}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1143848-CAEE-475B-B071-F955AC84D823}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1143848-CAEE-475B-B071-F955AC84D823}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1143848-CAEE-475B-B071-F955AC84D823}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
