@@ -9,18 +9,18 @@
 
 @inject NavigationManager Navigation
 
-<NavBar Title="CubeRobot panel sterowania" Buttons="@([("RobotSettings", "settings/robot")])" ></NavBar>
+<NavBar Title="Panel sterowania robotem" Buttons="@([("RobotSettings", "settings/robot")])" ></NavBar>
 
-<div class="container-fluid mt-4">
-    <div class="row">
+<div class="container-fluid p-1 g-2">
+    <div class="row g-2">
         <!-- Left Sidebar - cube configuration -->
         <div class="col-md-4">
-            <div class="card mb-4">
+            <div class="card mb-2">
                 <div class="card-body">
                     <CubePreview Cube="_cube" />
                     <div class="form-group mt-2">
                         <label for="currentConfig">Układ kostki</label>
-                        <textarea id="currentConfig" class="form-control" readonly style="resize:none;font-family:monospace">@_cube.ToString()</textarea>
+                        <textarea id="currentConfig" class="form-control font-monospace" readonly style="resize:none;">@_cube.ToString()</textarea>
                     </div>
                     <button @onclick="@(() => Navigation.NavigateTo("/cube-input"))" class="btn btn-primary mt-2">Wprowadź konfigurację kostki</button>
                 </div>
@@ -30,7 +30,7 @@
         <!-- Right Content Area -->
         <div class="col-md-8">
             <!-- Settings Section -->
-            <div class="card mb-4">
+            <div class="card mb-2">
                 <div class="card-body">
                     <div class="form-row row">
                         <div class="form-group col-md-6">
@@ -60,44 +60,15 @@
             </div>
 
             <!-- State Section -->
-            <div class="card mb-4">
+            <div class="card mb-2">
                 <div class="card-body">                   
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Stan ramienia</th>
-                                <th scope="col">Stan rotora</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Przód</td>
-                                <td>@_robotMovers[0].GetDescriptor()</td>
-                                <td>@_robotRotors[0].GetDescriptor()</td>
-                            </tr>
-                            <tr>
-                                <td>Lewo</td>
-                                <td>@_robotMovers[1].GetDescriptor()</td>
-                                <td>@_robotRotors[1].GetDescriptor()</td>
-                            </tr>
-                            <tr>
-                                <td>Prawo</td>
-                                <td>@_robotMovers[2].GetDescriptor()</td>
-                                <td>@_robotRotors[2].GetDescriptor()</td>
-                            </tr>
-                            <tr>
-                                <td>Tył</td>
-                                <td>@_robotMovers[3].GetDescriptor()</td>
-                                <td>@_robotRotors[3].GetDescriptor()</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="d-flex justify-content-between mt-3">
-                        <h4>Stan robota: <span class="badge rounded-pill bg-primary">@_robotState.GetDescriptor()</span></h4>
-                        <div>
-                            <RobotControllButtonPanel RobotState="Robot.CurrentState"/> @* TODO: Check if component get parameter update upon robot state change *@
-                        </div>
+                    <RobotStateTable RotorStates="@_robotRotors" MoverStates="@_robotMovers"/>
+                    <div class="d-flex align-items-center mt-2">
+                        <h5>Stan robota:
+                            <span class="badge rounded-pill bg-primary">@_robotState.GetDescriptor()</span>
+                        </h5>
+                        <div class="flex-grow-1"></div>
+                        <RobotControllButtonPanel RobotState="Robot.CurrentState"/> @* TODO: Check if component get parameter update upon robot state change *@
                     </div>
                 </div>
             </div>
@@ -109,6 +80,9 @@
 {
     [Inject]
     public IRobot Robot { get; set; } = null!;
+
+    [SupplyParameterFromQuery(Name = "cube")]
+    public string StartingCubeConfiguration { get; set; } = string.Empty;
 
     [CascadingParameter]
     private IErrorDisplay ErrorDisplay { get; set; } = null!;
@@ -130,6 +104,15 @@
         Robot.RobotStateChanged += (s, e) => _robotState = e.CurrentState;
         Robot.MoveQueueChanged += OnRobotMoveQueueChanged;
         Robot.RobotEffectorsStateChanged += OnRobotEffectorsStateChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(StartingCubeConfiguration))
+        {
+            _cube = Cube.FromConfigurationString(StartingCubeConfiguration);
+            // TODO: Error handling
+        }
     }
 
     private void OnRobotMoveQueueChanged(object sender, MoveQueueEventArgs e)

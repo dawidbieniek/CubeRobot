@@ -1,11 +1,10 @@
 ﻿@using CubeRobot.Robot
 
-<button type="button" class="btn btn-secondary" disabled>Skip Current State</button>
-<button type="button" class="btn btn-primary ms-2">Proceed to Next State</button>
+<button type="button" class="btn btn-secondary me-2" disabled>Pomiń krok</button>
+<button type="button" class="btn btn-primary">Następny krok</button>
 
 @code 
 {
     [Parameter]
     public RobotState RobotState { get; set; }
-
 }

@@ -1,19 +1,18 @@
-﻿<nav class="navbar navbar-expand p-2 navbar-dark bg-primary">
+﻿<nav class="navbar navbar-expand navbar-dark bg-primary" style="padding:0.25rem 0.5rem 0.25rem 0.5rem">
     @if(OnBackClicked.HasDelegate)
     {
         <button class="btn btn-outline-light me-2" @onclick="() => OnBackClicked.InvokeAsync()">Wróć</button>
     }
-    <span class="navbar-brand">Robot Cube Solver Control Panel</span>
-    <div class="ms-auto">
-        <ul class="navbar-nav">
-            @foreach((string title, string link) button in Buttons)
-            {
-                <li class="nav-item">
-                    <a class="btn btn-outline-light" href="@button.link">@button.title</a>
-                </li>
-            }
-        </ul>
-    </div>
+    <span class="navbar-brand">@Title</span>
+    <div class="flex-grow-1"/>
+    <ul class="navbar-nav">
+        @foreach((string title, string link) button in Buttons)
+        {
+            <li class="nav-item">
+                <a class="btn btn-outline-light" href="@button.link">@button.title</a>
+            </li>
+        }
+    </ul>
 </nav>
 
 @code 

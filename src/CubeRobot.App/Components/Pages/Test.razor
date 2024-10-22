@@ -88,11 +88,11 @@
 
     private void ProcessImage()
     {
-        byte[] matData = PhotoAnalyzer.TestPhoto(_imageData, _gray, _gauss, _minThreshold, _maxThreshold, _minArea, _maxArea);
-        _matPreview = $"data:{_fileType};base64,{Convert.ToBase64String(matData)}";
+        // byte[] matData = PhotoAnalyzer.TestPhoto(_imageData, _gray, _gauss, _minThreshold, _maxThreshold, _minArea, _maxArea);
+        // _matPreview = $"data:{_fileType};base64,{Convert.ToBase64String(matData)}";
 
-        byte[] thData = PhotoAnalyzer.DetectRedColor(_imageData, _minColor, _maxColor);
-        _thPreview = $"data:{_fileType};base64,{Convert.ToBase64String(thData)}";
+        // byte[] thData = PhotoAnalyzer.DetectRedColor(_imageData, _minColor, _maxColor);
+        // _thPreview = $"data:{_fileType};base64,{Convert.ToBase64String(thData)}";
 
     }
 

@@ -1,14 +1,17 @@
 ﻿using System.Diagnostics;
 
+using CubeRobot.CV.Color;
 using CubeRobot.Models.RubiksCube;
 
 using OpenCvSharp;
 
+using static System.Net.Mime.MediaTypeNames;
+
 namespace CubeRobot.CV;
 
-public static class PhotoAnalyzer
+public class PhotoAnalyzer
 {
-    private static CubeFaceColorParser _parser = new(
+    private readonly CubeFaceColorParser _parser = new(
         new Dictionary<LABColor, CubeFaceColor>
         {
             {new(100f, 0f, 0f), CubeFaceColor.White },
@@ -21,108 +24,64 @@ public static class PhotoAnalyzer
         }
      );
 
-    public static byte[] TestPhoto(byte[] imageData, bool gray, bool gaussian, int mTh, int MTh, int ma, int Ma)
+    public CubeFaceColor[,] ExtractColorsFromImage(byte[] imageData)
     {
-        using Mat image = Mat.FromImageData(imageData);
+        using Mat image = PreprocessImage(Mat.FromImageData(imageData));
 
-        if(gray)
+
+        Cv2.FindContours(image, out Point[][] contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+       // Filter contours for shape simillar to cubie
+        Debug.WriteLine("## Found blocks ##");
+        List<Rect> blocksBoundingRects = ContourHelper.FilterContours(contours);
+
+        // Sort cubies based on their position
+        List<List<Rect>> sortedBoundingRects = [];
+        int yEps = blocksBoundingRects[0].Height / 2;
+
+        blocksBoundingRects = [.. blocksBoundingRects.OrderBy(rect => rect.Y)];
+
+        int relativeY = blocksBoundingRects[0].Y;
+        List<Rect> row = [];
+        foreach (var boundingRect in blocksBoundingRects)
         {
-            using Mat tmp = new();
-            Cv2.CvtColor(image, tmp, ColorConversionCodes.BGR2GRAY);
-            tmp.CopyTo(image);
+            if (Math.Abs(boundingRect.Y - relativeY) < yEps)
+                row.Add(boundingRect);
+            else
+            {
+                sortedBoundingRects.Add(row);
+                relativeY = boundingRect.Y;
+                row = [boundingRect];
+            }
         }
+        sortedBoundingRects.Add(row);
 
-        if(gaussian)
-        {
+        for (int i = 0; i < sortedBoundingRects.Count; i++)
+            sortedBoundingRects[i] = [.. sortedBoundingRects[i].OrderBy(rect => rect.X)];
 
-            using Mat tmp = new();
-            Cv2.GaussianBlur(image, tmp, new(3, 3), 0);
-            tmp.CopyTo(image);
-        }
+        // Get fragmends of image based on bounding rects
+        imageFragments = new byte[sortedBoundingRects.Count, sortedBoundingRects[0].Count][];
+        for (int i = 0; i < sortedBoundingRects.Count; i++)
+            for (int j = 0; j < sortedBoundingRects[i].Count; j++)
+                imageFragments[i, j] = originalImage[sortedBoundingRects[i][j]].ToBytes();
 
-        // Parameters tuned to detect only circles
-        var circleParams = new SimpleBlobDetector.Params
-        {
-            MinThreshold = mTh,
-            MaxThreshold = MTh,
+        // Get dominant color from image fragment
+        colors = new CubeFaceColor[sortedBoundingRects.Count, sortedBoundingRects[0].Count];
+        for (int i = 0; i < sortedBoundingRects.Count; i++)
+            for (int j = 0; j < sortedBoundingRects[i].Count; j++)
+            {
+                Vec3i color = DominantColor(Mat.FromImageData(originalImage[sortedBoundingRects[i][j]].ToBytes())).ToVec3i();
+                colors[i, j] = _parser.ParseColor(color.Item0, color.Item1, color.Item2);
 
-            FilterByArea = true,
-            MinArea = ma,
-            MaxArea = Ma,
-            FilterByCircularity = true,
-            MinCircularity = 0.5f,
-            MaxCircularity = 0.8f,
-            FilterByColor = false,
-            FilterByConvexity = false,
-            FilterByInertia = false,
-        };
+                Debug.WriteLine($"Y: {i} X: {j} C:{color}");
+            }
 
-        using Mat circles = new();
-        using var circleDetector = SimpleBlobDetector.Create(circleParams);
-        var circleKeyPoints = circleDetector.Detect(image);
-        Cv2.DrawKeypoints(image, circleKeyPoints, circles, Scalar.HotPink, DrawMatchesFlags.DrawRichKeypoints);
-
-        //Cv2.Sobel(image, circles, MatType.CV_64F, 1, 1, 5);
-
-        return circles.ToBytes();
     }
 
-    public static byte[] Threshold(byte[] imageData, int threshold)
+    public byte[] ProcessCubeImage(byte[] imageData, out byte[,][] imageFragments, out CubeFaceColor[,] colors)
     {
-        using Mat image = Mat.FromImageData(imageData);
-        using Mat dst = new();
-        Cv2.Threshold(image, dst, threshold, 1, ThresholdTypes.Tozero);
-
-        return dst.ToBytes();
-    }
-
-    public static byte[] DetectRedColor(byte[] imageData, int min, int max)
-    {
-        using Mat image = Mat.FromImageData(imageData);
-        using Mat swap = new();
-        Cv2.CvtColor(image, swap, ColorConversionCodes.BGR2HSV);
-        Cv2.InRange(swap, new(min, 0, 0), new(max, 255, 255), image);
-
-        return image.ToBytes();
-    }
-
-    public static byte[] ProcessCube(byte[] imageData, out byte[,][] imageFragments, out CubeFaceColor[,] colors)
-    {
-        using Mat image = Mat.FromImageData(imageData);
+        using Mat image = PreprocessImage(Mat.FromImageData(imageData));
         using Mat originalImage = Mat.FromImageData(imageData);
 
-        // Process image
-        using (Mat buffer = new())
-        {
-            Cv2.CvtColor(image, buffer, ColorConversionCodes.BGR2GRAY);
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.FastNlMeansDenoising(image, buffer);
-            Cv2.FastNlMeansDenoising(image, buffer, 7, 7, 20);
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.Blur(image, buffer, new(blur, blur));
-            Cv2.Blur(image, buffer, new(3, 3));
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.Canny(image, buffer, threshold1, threshold2);
-            Cv2.Canny(image, buffer, 30, 60, 3);
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.Dilate(image, buffer, new Mat());
-            Cv2.Dilate(image, buffer, Cv2.GetStructuringElement(MorphShapes.Rect, new(7, 7)));
-            buffer.CopyTo(image);
-
-            
-        }
 
         // Convert image back to BRG format so that contours can be draw on it
         Cv2.FindContours(image, out Point[][] contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
@@ -133,8 +92,8 @@ public static class PhotoAnalyzer
         }
         // Draw contours
         Cv2.DrawContours(image, contours, -1, new(255, 0, 255));
-
         // Filter contours for shape simillar to cubie
+        Debug.WriteLine("## Found blocks ##");
         List<Rect> blocksBoundingRects = [];
         foreach (Point[] contour in contours)
         {
@@ -200,6 +159,43 @@ public static class PhotoAnalyzer
         return image.ToBytes();
     }
 
+    private Mat PreprocessImage(Mat image)
+    { 
+        using (Mat buffer = new())
+        {
+            Cv2.CvtColor(image, buffer, ColorConversionCodes.BGR2GRAY);
+            buffer.CopyTo(image);
+        }
+        using (Mat buffer = new())
+        {
+            //Cv2.FastNlMeansDenoising(image, buffer);
+            Cv2.FastNlMeansDenoising(image, buffer, 7, 7, 20);
+            buffer.CopyTo(image);
+        }
+        using (Mat buffer = new())
+        {
+            //Cv2.Blur(image, buffer, new(blur, blur));
+            Cv2.Blur(image, buffer, new(3, 3));
+            buffer.CopyTo(image);
+        }
+        using (Mat buffer = new())
+        {
+            //Cv2.Canny(image, buffer, threshold1, threshold2);
+            Cv2.Canny(image, buffer, 30, 60, 3);
+            buffer.CopyTo(image);
+        }
+        using (Mat buffer = new())
+        {
+            //Cv2.Dilate(image, buffer, new Mat());
+            Cv2.Dilate(image, buffer, Cv2.GetStructuringElement(MorphShapes.Rect, new(7, 7)));
+            buffer.CopyTo(image);
+
+
+        }
+
+        return image;
+    }
+
     private static Vec3f DominantColor(Mat input)
     {
         int k = 1;
@@ -241,4 +237,5 @@ public static class PhotoAnalyzer
         return centers.At<Vec3f>(0, 0);
 
     }
+
 }

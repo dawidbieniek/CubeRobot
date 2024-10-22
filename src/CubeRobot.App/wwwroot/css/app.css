@@ -84,3 +84,10 @@ h1:focus {
         padding-left: env(safe-area-inset-left);
     }
 }
+
+label {
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

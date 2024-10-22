@@ -1,4 +1,4 @@
-﻿namespace CubeRobot.CV;
+﻿namespace CubeRobot.CV.Color;
 
 public readonly struct LABColor(float l, float a, float b)
 {

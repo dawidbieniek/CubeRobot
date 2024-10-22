@@ -1,4 +1,4 @@
-﻿namespace CubeRobot.CV;
+﻿namespace CubeRobot.CV.Color;
 
 /// <summary> CIE XYZ color representation, assuming D65 light source at 2°. Color components are
 /// normalized to 1 (not 100)
@@ -19,14 +19,14 @@ public readonly struct XYZColor(float x, float y, float z)
         float transformedZ = LABTransformationFunctionValue(normalizedXYZColor.Z);
 
         return new LABColor(
-            (116 * transformedY) - 16,
+            116 * transformedY - 16,
             500 * (transformedX - transformedY),
             200 * (transformedY - transformedZ));
     }
 
     private static float LABTransformationFunctionValue(float value) => value > TransformationFunctionValueThreshold
         ? MathF.Cbrt(value)
-        : (7.787037f * value) + 0.137931f;
+        : 7.787037f * value + 0.137931f;
 
     private XYZColor NormalizeToWhitePoint(XYZColor whitePoint) => new(
         X / whitePoint.X,

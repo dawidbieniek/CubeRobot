@@ -1,0 +1,41 @@
+﻿@using CubeRobot.Robot
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Stan ramienia</th>
+            <th scope="col">Stan rotora</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Przód</td>
+            <td>@MoverStates[0].GetDescriptor()</td>
+            <td>@RotorStates[0].GetDescriptor()</td>
+        </tr>
+        <tr>
+            <td>Lewo</td>
+            <td>@MoverStates[1].GetDescriptor()</td>
+            <td>@RotorStates[1].GetDescriptor()</td>
+        </tr>
+        <tr>
+            <td>Prawo</td>
+            <td>@MoverStates[2].GetDescriptor()</td>
+            <td>@RotorStates[2].GetDescriptor()</td>
+        </tr>
+        <tr>
+            <td>Tył</td>
+            <td>@MoverStates[3].GetDescriptor()</td>
+            <td>@RotorStates[3].GetDescriptor()</td>
+        </tr>
+    </tbody>
+</table>
+
+@code 
+{
+    [Parameter, EditorRequired]
+    public RotorState[] RotorStates { get; set; } = [];
+    [Parameter, EditorRequired]
+    public MoverState[] MoverStates { get; set; } = [];
+}

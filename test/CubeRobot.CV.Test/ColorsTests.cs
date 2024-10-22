@@ -1,3 +1,5 @@
+using CubeRobot.CV.Color;
+
 namespace CubeRobot.CV.Test;
 
 [TestClass]

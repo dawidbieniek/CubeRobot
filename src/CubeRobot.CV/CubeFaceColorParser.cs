@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+using CubeRobot.CV.Color;
 using CubeRobot.Models.RubiksCube;
 
 namespace CubeRobot.CV;
@@ -18,6 +19,7 @@ public class CubeFaceColorParser(Dictionary<LABColor, CubeFaceColor> color2FaceM
         float minDifference = float.MaxValue;
 
         Debug.Write('\n');
+        Debug.WriteLine("## Block color distance ##");
         foreach (var kvp in _color2FaceMap)
         {
             float currentDifference = currentColor.DifferenceTo(kvp.Key);

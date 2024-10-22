@@ -78,7 +78,7 @@
 
     private void ProcessImage()
     {
-        byte[] matData = PhotoAnalyzer.ProcessCube(_imageData, out byte[,][] imageFragmentsData, out _faceColors);
+        byte[] matData = PhotoAnalyzer.ProcessCubeImage(_imageData, out byte[,][] imageFragmentsData, out _faceColors);
         _matPreview = $"data:{_fileType};base64,{Convert.ToBase64String(matData)}";
 
         _imageFragments = new string[imageFragmentsData.GetLength(0), imageFragmentsData.GetLength(1)];

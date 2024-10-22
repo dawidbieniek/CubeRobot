@@ -1,4 +1,4 @@
-﻿namespace CubeRobot.CV;
+﻿namespace CubeRobot.CV.Color;
 
 /// <summary>
 /// Normalized RGB color representation. Values are in range (0, 1)
@@ -51,9 +51,9 @@ public readonly struct SRGBColor
         SRGBColor linearized = Linearize();
         // Multiply by transformation matrix
         return new XYZColor(
-            (0.4124f * linearized.R) + (0.3576f * linearized.G) + (0.1805f * linearized.B),
-            (0.2126f * linearized.R) + (0.7152f * linearized.G) + (0.0722f * linearized.B),
-            (0.0193f * linearized.R) + (0.1192f * linearized.G) + (0.9505f * linearized.B));
+            0.4124f * linearized.R + 0.3576f * linearized.G + 0.1805f * linearized.B,
+            0.2126f * linearized.R + 0.7152f * linearized.G + 0.0722f * linearized.B,
+            0.0193f * linearized.R + 0.1192f * linearized.G + 0.9505f * linearized.B);
     }
 
     private SRGBColor Linearize() => new(
