@@ -3,12 +3,15 @@
 using CubeRobot.CV.Color;
 using CubeRobot.Models.RubiksCube;
 
+using OpenCvSharp;
+
 namespace CubeRobot.CV;
-public class CubeFaceColorParser(Dictionary<LABColor, CubeFaceColor> color2FaceMap, XYZColor? whiteBalanceColor = null)
+
+public class CubeFaceColorParser(Dictionary<LABColor, CubeFaceColor> colorFaceMap, XYZColor? whiteBalanceColor = null)
 {
     private static readonly XYZColor DefaultWhiteColor = new(0.5062f, 0.5368f, 0.5527f);//new (0.9505f, 1f, 1.0888f);
 
-    private readonly Dictionary<LABColor, CubeFaceColor> _color2FaceMap = color2FaceMap;
+    private readonly Dictionary<LABColor, CubeFaceColor> _colorFaceMap = colorFaceMap;
     private readonly XYZColor _whiteBalanceColor = whiteBalanceColor ?? DefaultWhiteColor;
 
     public CubeFaceColor ParseColor(int b, int g, int r)
@@ -20,7 +23,7 @@ public class CubeFaceColorParser(Dictionary<LABColor, CubeFaceColor> color2FaceM
 
         Debug.Write('\n');
         Debug.WriteLine("## Block color distance ##");
-        foreach (var kvp in _color2FaceMap)
+        foreach (var kvp in _colorFaceMap)
         {
             float currentDifference = currentColor.DifferenceTo(kvp.Key);
             Debug.WriteLine($"{currentColor}\t{kvp.Key}({kvp.Value})\t{currentDifference}");
@@ -31,8 +34,21 @@ public class CubeFaceColorParser(Dictionary<LABColor, CubeFaceColor> color2FaceM
             }
         }
 
-        return closestColor == null 
-            ? throw new Exception("Couldn't find closest color") 
-            : _color2FaceMap[closestColor.Value];
+        return closestColor == null
+            ? throw new Exception("Couldn't find closest color")
+            : _colorFaceMap[closestColor.Value];
+    }
+
+    public CubeFaceColor[,] ParseColors(Vec3i[,] colors)
+    {
+        CubeFaceColor[,] faceColors = new CubeFaceColor[colors.GetLength(0), colors.GetLength(1)];
+
+        for (int i = 0; i < faceColors.GetLength(0); i++)
+            for (int j = 0; j < faceColors.GetLength(1); j++)
+            {
+                faceColors[i, j] = ParseColor(colors[i, j].Item0, colors[i, j].Item1, colors[i, j].Item2);
+            }
+
+        return faceColors;
     }
 }

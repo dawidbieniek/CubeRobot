@@ -9,7 +9,7 @@
 
 @inject NavigationManager Navigation
 
-<NavBar Title="Panel sterowania robotem" Buttons="@([("RobotSettings", "settings/robot")])" ></NavBar>
+<NavBar Title="Panel sterowania robotem" Buttons="@([("Ustawienia robota", "settings/robot")])" ></NavBar>
 
 <div class="container-fluid p-1 g-2">
     <div class="row g-2">
@@ -68,7 +68,7 @@
                             <span class="badge rounded-pill bg-primary">@_robotState.GetDescriptor()</span>
                         </h5>
                         <div class="flex-grow-1"></div>
-                        <RobotControllButtonPanel RobotState="Robot.CurrentState"/> @* TODO: Check if component get parameter update upon robot state change *@
+                        <RobotControllButtonPanel RobotState="Robot.CurrentState" OnNextStep="@NextRobotStep" OnSkipStep="@SkipRobotStep" /> @* TODO: Check if component get parameter update upon robot state change *@
                     </div>
                 </div>
             </div>
@@ -102,8 +102,9 @@
     protected override void OnInitialized()
     {
         Robot.RobotStateChanged += (s, e) => _robotState = e.CurrentState;
-        Robot.MoveQueueChanged += OnRobotMoveQueueChanged;
-        Robot.RobotEffectorsStateChanged += OnRobotEffectorsStateChanged;
+        Robot.MoveQueueChanged += (s, e) => InvokeAsync(() => OnRobotMoveQueueChanged(s, e));
+        Robot.CommandQueueChanged += (s, e) => InvokeAsync(() => OnRobotCommandQueueChanged(s, e));
+        Robot.RobotEffectorsStateChanged += (s, e) => InvokeAsync(() => OnRobotEffectorsStateChanged(s, e));
     }
 
     protected override void OnParametersSet()
@@ -121,6 +122,8 @@
             _moveQueue = [.. e.RemainingMoves];
         else
             _robotMoveProgressQueue.AdvanceProgress();
+
+        StateHasChanged();
     }
 
     private void OnRobotCommandQueueChanged(object sender, CommandQueueEventArgs e)
@@ -136,17 +139,34 @@
         _robotRotors = e.RotorStates;
         _robotMovers = e.MoverStates;
 
-        // TODO: StatehasChanged??
+        StateHasChanged();
     }
 
     private void ChangeSelectedPort(string portName)
     {
+        if (portName == "None")
+            return;
         Robot.ConfigureCommunicationChannel(new SerialPortCommunication(portName));
     }
 
     private void ChangeSelectedAlgorithm(CubeSolvingAlgorithm algorithm)
     {
         Solver = algorithm.Solver();
+    }
+
+    private void NextRobotStep()
+    {
+        if(Robot.CurrentState == RobotState.NoCube)
+        {
+            _moveQueue = [..Solver.SolveCube(_cube)];
+            Robot.SolveCube(_moveQueue);
+            return;
+        }
+    }
+
+    private void SkipRobotStep()
+    {
+        
     }
 
 }

@@ -11,13 +11,16 @@ public class Cube
 
     private readonly CubeFaceColor[][,] _blocks;
 
-    public Cube(int size = 3, bool initializeColors = false)
+    public Cube(CubeFaceColor[][,] blocks, int size = 3)
     {
         Size = size;
-        _blocks = Enumerable.Range(0, NumberOfFaces).Select(_ => new CubeFaceColor[Size, Size]).ToArray();
+        _blocks = blocks;
 
         _rotationHelper = new(size, _blocks);
+    }
 
+    public Cube(int size = 3, bool initializeColors = false) : this(Enumerable.Range(0, NumberOfFaces).Select(_ => new CubeFaceColor[size, size]).ToArray(), size)
+    {
         if (initializeColors)
             InitializeColors();
         else

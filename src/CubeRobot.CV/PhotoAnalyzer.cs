@@ -5,13 +5,11 @@ using CubeRobot.Models.RubiksCube;
 
 using OpenCvSharp;
 
-using static System.Net.Mime.MediaTypeNames;
-
 namespace CubeRobot.CV;
 
-public class PhotoAnalyzer
+public class PhotoAnalyzer(PreprocessingSettings? settings = null)
 {
-    private readonly CubeFaceColorParser _parser = new(
+    private readonly CubeFaceColorParser _colorParser = new(
         new Dictionary<LABColor, CubeFaceColor>
         {
             {new(100f, 0f, 0f), CubeFaceColor.White },
@@ -20,68 +18,73 @@ public class PhotoAnalyzer
             {new(97.14f, -21.55f, 94.48f), CubeFaceColor.Yellow },
             {new(53.24f, 80.09f, 67.2f), CubeFaceColor.Red },
             {new(32.3f, 79.19f, -107.86f), CubeFaceColor.Blue },
-
         }
      );
 
+    public PreprocessingSettings Settings { get; private init; } = settings ?? PreprocessingSettings.Default;
+
     public CubeFaceColor[,] ExtractColorsFromImage(byte[] imageData)
     {
-        using Mat image = PreprocessImage(Mat.FromImageData(imageData));
-
+        using Mat image = ImagePreprocessor.PreprocessImage(Mat.FromImageData(imageData), Settings);
+        ImageFragmentExtractor fragmentExtractor = new(Mat.FromImageData(imageData));
 
         Cv2.FindContours(image, out Point[][] contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
-       // Filter contours for shape simillar to cubie
+
+        // Filter contours for shape simillar to cubie
         Debug.WriteLine("## Found blocks ##");
-        List<Rect> blocksBoundingRects = ContourHelper.FilterContours(contours);
+        List<Rect> filteredContours = ContourHelper.FilterContours(contours, image.Width / 2);
+        List<List<Rect>> sortedContours = ContourHelper.SortContoursByPosition(filteredContours);
 
-        // Sort cubies based on their position
-        List<List<Rect>> sortedBoundingRects = [];
-        int yEps = blocksBoundingRects[0].Height / 2;
-
-        blocksBoundingRects = [.. blocksBoundingRects.OrderBy(rect => rect.Y)];
-
-        int relativeY = blocksBoundingRects[0].Y;
-        List<Rect> row = [];
-        foreach (var boundingRect in blocksBoundingRects)
+        if (sortedContours.Count == 0)
         {
-            if (Math.Abs(boundingRect.Y - relativeY) < yEps)
-                row.Add(boundingRect);
-            else
-            {
-                sortedBoundingRects.Add(row);
-                relativeY = boundingRect.Y;
-                row = [boundingRect];
-            }
+            Debug.WriteLine("Couldn't find any contours!");
+            throw new InvalidOperationException("Couldn't find any contours!");
         }
-        sortedBoundingRects.Add(row);
 
-        for (int i = 0; i < sortedBoundingRects.Count; i++)
-            sortedBoundingRects[i] = [.. sortedBoundingRects[i].OrderBy(rect => rect.X)];
+        // Get dominant color from image fragments
+        Vec3i[,] dominantFragmentColors = fragmentExtractor.ExtractDominantColorsFromFragments(sortedContours);
+        return _colorParser.ParseColors(dominantFragmentColors);
+    }
 
-        // Get fragmends of image based on bounding rects
-        imageFragments = new byte[sortedBoundingRects.Count, sortedBoundingRects[0].Count][];
-        for (int i = 0; i < sortedBoundingRects.Count; i++)
-            for (int j = 0; j < sortedBoundingRects[i].Count; j++)
-                imageFragments[i, j] = originalImage[sortedBoundingRects[i][j]].ToBytes();
+    public FragmentData ExtractFragmentDataFromImage(byte[] imageData)
+    {
+        using Mat originalImage = Mat.FromImageData(imageData);
+        using Mat image = ImagePreprocessor.PreprocessImage(originalImage.Clone(), Settings);
+        ImageFragmentExtractor fragmentExtractor = new(Mat.FromImageData(imageData));
 
-        // Get dominant color from image fragment
-        colors = new CubeFaceColor[sortedBoundingRects.Count, sortedBoundingRects[0].Count];
-        for (int i = 0; i < sortedBoundingRects.Count; i++)
-            for (int j = 0; j < sortedBoundingRects[i].Count; j++)
-            {
-                Vec3i color = DominantColor(Mat.FromImageData(originalImage[sortedBoundingRects[i][j]].ToBytes())).ToVec3i();
-                colors[i, j] = _parser.ParseColor(color.Item0, color.Item1, color.Item2);
+        Cv2.FindContours(image, out Point[][] contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+        Cv2.DrawContours(image, contours, -1, new(255, 0, 255));
 
-                Debug.WriteLine($"Y: {i} X: {j} C:{color}");
-            }
+        // Filter contours for shape simillar to cubie
+        Debug.WriteLine("## Found blocks ##");
+        List<Rect> filteredContours = ContourHelper.FilterContours(contours, image.Width / 2);
+        List<List<Rect>> sortedContours = ContourHelper.SortContoursByPosition(filteredContours);
 
+        if (sortedContours.Count == 0)
+            return new() { ProcessedImageRawData = image.ToBytes() };
+
+        byte[,][] imageFragments = new byte[sortedContours.Count, sortedContours[0].Count][];
+        for (int i = 0; i < sortedContours.Count; i++)
+            for (int j = 0; j < sortedContours[i].Count; j++)
+                imageFragments[i, j] = originalImage[sortedContours[i][j]].ToBytes();
+
+        // Get dominant color from image fragments
+        Vec3i[,] dominantFragmentColors = fragmentExtractor.ExtractDominantColorsFromFragments(sortedContours);
+        CubeFaceColor[,] colors = _colorParser.ParseColors(dominantFragmentColors);
+
+        return new()
+        {
+            ProcessedImageRawData = image.ToBytes(),
+            FragmentImageRawData = imageFragments,
+            FragmentColors = colors
+        };
     }
 
     public byte[] ProcessCubeImage(byte[] imageData, out byte[,][] imageFragments, out CubeFaceColor[,] colors)
     {
-        using Mat image = PreprocessImage(Mat.FromImageData(imageData));
+        using Mat image = ImagePreprocessor.PreprocessImage(Mat.FromImageData(imageData), Settings);
         using Mat originalImage = Mat.FromImageData(imageData);
-
+        ImageFragmentExtractor fragmentExtractor = new(Mat.FromImageData(imageData));
 
         // Convert image back to BRG format so that contours can be draw on it
         Cv2.FindContours(image, out Point[][] contours, out _, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
@@ -94,148 +97,37 @@ public class PhotoAnalyzer
         Cv2.DrawContours(image, contours, -1, new(255, 0, 255));
         // Filter contours for shape simillar to cubie
         Debug.WriteLine("## Found blocks ##");
-        List<Rect> blocksBoundingRects = [];
-        foreach (Point[] contour in contours)
+        List<Rect> blocksBoundingRects = ContourHelper.FilterAndDrawContours(contours, image.Width / 2, image);
+
+        if (blocksBoundingRects.Count < 9)
         {
-            Point[] approx = Cv2.ApproxPolyDP(contour, 0.1 * Cv2.ArcLength(contour, true), true); 
-            
-            if (approx.Length == 4)
-            {
-                Rect boundingRect = Cv2.BoundingRect(approx);
-                float ratio = (float)boundingRect.Width / boundingRect.Height;
-                double area = Cv2.ContourArea(approx);
-
-                Debug.WriteLine($"R: {ratio} A: {area}");
-
-                if (ratio >= 0.8 && ratio <= 1.21 && boundingRect.Width >= 20 && boundingRect.Width <= 60 && area >= 400)
-                {
-                    blocksBoundingRects.Add(boundingRect);
-                    Cv2.DrawContours(image, [approx], -1, new(0, 255, 255));
-                }
-            }
+            imageFragments = new byte[0, 0][];
+            colors = new CubeFaceColor[0, 0];
+            return image.ToBytes();
         }
 
         // Sort cubies based on their position
-        List<List<Rect>> sortedBoundingRects = [];
-        int yEps = blocksBoundingRects[0].Height / 2;
-
-        blocksBoundingRects = [.. blocksBoundingRects.OrderBy(rect => rect.Y)];
-
-        int relativeY = blocksBoundingRects[0].Y;
-        List<Rect> row = [];
-        foreach (var boundingRect in blocksBoundingRects)
-        {
-            if (Math.Abs(boundingRect.Y - relativeY) < yEps)
-                row.Add(boundingRect);
-            else
-            {
-                sortedBoundingRects.Add(row);
-                relativeY = boundingRect.Y;
-                row = [boundingRect];
-            }
-        }
-        sortedBoundingRects.Add(row);
-
-        for (int i = 0; i < sortedBoundingRects.Count; i++)
-            sortedBoundingRects[i] = [.. sortedBoundingRects[i].OrderBy(rect => rect.X)];
+        List<List<Rect>> sortedBoundingRects = ContourHelper.SortContoursByPosition(blocksBoundingRects);
 
         // Get fragmends of image based on bounding rects
-        imageFragments = new byte[sortedBoundingRects.Count,sortedBoundingRects[0].Count][];
+        imageFragments = new byte[sortedBoundingRects.Count, sortedBoundingRects[0].Count][];
         for (int i = 0; i < sortedBoundingRects.Count; i++)
             for (int j = 0; j < sortedBoundingRects[i].Count; j++)
                 imageFragments[i, j] = originalImage[sortedBoundingRects[i][j]].ToBytes();
 
         // Get dominant color from image fragment
-        colors = new CubeFaceColor[sortedBoundingRects.Count,sortedBoundingRects[0].Count];
-        for (int i = 0; i < sortedBoundingRects.Count; i++)
-            for (int j = 0; j < sortedBoundingRects[i].Count; j++)
-            {
-                Vec3i color = DominantColor(Mat.FromImageData(originalImage[sortedBoundingRects[i][j]].ToBytes())).ToVec3i();
-                colors[i, j] = _parser.ParseColor(color.Item0, color.Item1, color.Item2);
-
-                Debug.WriteLine($"Y: {i} X: {j} C:{color}");
-            }
+        Vec3i[,] dominantFragmentColors = fragmentExtractor.ExtractDominantColorsFromFragments(sortedBoundingRects);
+        colors = _colorParser.ParseColors(dominantFragmentColors);
 
         return image.ToBytes();
     }
 
-    private Mat PreprocessImage(Mat image)
-    { 
-        using (Mat buffer = new())
-        {
-            Cv2.CvtColor(image, buffer, ColorConversionCodes.BGR2GRAY);
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.FastNlMeansDenoising(image, buffer);
-            Cv2.FastNlMeansDenoising(image, buffer, 7, 7, 20);
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.Blur(image, buffer, new(blur, blur));
-            Cv2.Blur(image, buffer, new(3, 3));
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.Canny(image, buffer, threshold1, threshold2);
-            Cv2.Canny(image, buffer, 30, 60, 3);
-            buffer.CopyTo(image);
-        }
-        using (Mat buffer = new())
-        {
-            //Cv2.Dilate(image, buffer, new Mat());
-            Cv2.Dilate(image, buffer, Cv2.GetStructuringElement(MorphShapes.Rect, new(7, 7)));
-            buffer.CopyTo(image);
+    public IAsyncEnumerator<byte[]> PreprocessImageStepByStep(byte[] imageRawData) => ImagePreprocessor.PreprocessImageStepByStep(Mat.FromImageData(imageRawData), Settings);
 
-
-        }
-
-        return image;
-    }
-
-    private static Vec3f DominantColor(Mat input)
+    public readonly struct FragmentData()
     {
-        int k = 1;
-
-        using Mat points = new();
-        using Mat labels = new();
-        using Mat centers = new();
-        int width = input.Cols;
-        int height = input.Rows;
-
-        points.Create(width * height, 1, MatType.CV_32FC3);
-        centers.Create(k, 1, points.Type());
-
-        // Input Image Data
-        int i = 0;
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++, i++)
-            {
-                Vec3f vec3f = new()
-                {
-                    Item0 = input.At<Vec3b>(y, x).Item0,
-                    Item1 = input.At<Vec3b>(y, x).Item1,
-                    Item2 = input.At<Vec3b>(y, x).Item2
-                };
-
-                points.Set(i, vec3f);
-            }
-        }
-
-        // Criteria:
-        // – Stop the algorithm iteration if specified accuracy, epsilon, is reached.
-        // – Stop the algorithm after the specified number of iterations, MaxIter.
-        var criteria = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.MaxIter, 10, 1.0);
-
-        // Finds centers of clusters and groups input samples around the clusters.
-        Cv2.Kmeans(data: points, k: k, bestLabels: labels, criteria: criteria, attempts: 3, flags: KMeansFlags.PpCenters, centers: centers);
-
-        return centers.At<Vec3f>(0, 0);
-
+        public byte[,][] FragmentImageRawData { get; init; } = new byte[0, 0][];
+        public CubeFaceColor[,] FragmentColors { get; init; } = new CubeFaceColor[0, 0];
+        public byte[] ProcessedImageRawData { get; init; } = new byte[0];
     }
-
 }

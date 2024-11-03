@@ -1,4 +1,5 @@
 ﻿using BlazorSortableList;
+
 using CubeRobot.Models.RubiksCube;
 
 namespace CubeRobot.App.Components.Pages.CubeInput.ImageDrop;
@@ -46,6 +47,15 @@ public class CubeSortableListGroup : MultiSortableListGroup<ImageFile>
 
     public string GetFaceListId(CubeFace face) => _faceListIds[face];
 
+    public Dictionary<CubeFace, ImageFile?> GetCubeNetImageData() => new()
+    {
+        {CubeFace.Front, _faceListModels[CubeFace.Front].Items.FirstOrDefault()},
+        {CubeFace.Right, _faceListModels[CubeFace.Right].Items.FirstOrDefault()},
+        {CubeFace.Up, _faceListModels[CubeFace.Up].Items.FirstOrDefault()},
+        {CubeFace.Back, _faceListModels[CubeFace.Back].Items.FirstOrDefault()},
+        {CubeFace.Left, _faceListModels[CubeFace.Left].Items.FirstOrDefault()},
+        {CubeFace.Down, _faceListModels[CubeFace.Down].Items.FirstOrDefault()}
+    };
 
     protected override void ListMoveItem(int srcIndex, int dstIndex, IList<ImageFile> src, IList<ImageFile> dst)
     {

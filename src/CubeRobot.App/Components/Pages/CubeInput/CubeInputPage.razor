@@ -79,4 +79,13 @@
         else
             Navigation.NavigateTo($"/?cube={_cubeConfigString}");
     }
+
+    private void UpdateCubeConfiguration(Cube newValue)
+    {
+        _cubeConfigString = newValue.ToString();
+        // TODO: State has changed??
+    }
+
+
+
 }

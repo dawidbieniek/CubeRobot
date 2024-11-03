@@ -1,7 +1,8 @@
 ﻿@using CubeRobot.Robot.Communication
 
 <label for="portSelect">Port USB</label>
-<InputSelect id="portSelect" class="form-control" Value="@_selectedPortName" ValueExpression="@(() => _selectedPortName)" ValueChanged="(string v) => SelectionChanged.InvokeAsync(v)">
+<InputSelect id="portSelect" class="form-control" Value="@_selectedPortName" ValueExpression="@(() => _selectedPortName)" ValueChanged="(string v) => ChangeSelection(v)">
+    <option value="None">Brak</option>
     @foreach (string option in SerialPortCommunication.ValidPorts)
     {
         <option value="@option">@option</option>
@@ -14,4 +15,10 @@
     public EventCallback<string> SelectionChanged { get; set; }
 
     private string _selectedPortName = string.Empty;
+
+    private async Task ChangeSelection(string value)
+    {
+        _selectedPortName = value;
+        await SelectionChanged.InvokeAsync(value);
+    }
 }
