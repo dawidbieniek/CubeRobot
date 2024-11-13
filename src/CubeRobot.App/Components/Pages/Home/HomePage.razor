@@ -118,20 +118,26 @@
 
     private void OnRobotMoveQueueChanged(object sender, MoveQueueEventArgs e)
     {
-        if (e.FinishedMove is null)
+        if (e.FinishedMove is null)    // Queue initialization
+        {
             _moveQueue = [.. e.RemainingMoves];
+            StateHasChanged();
+        }
         else
             _robotMoveProgressQueue.AdvanceProgress();
 
-        StateHasChanged();
     }
 
     private void OnRobotCommandQueueChanged(object sender, CommandQueueEventArgs e)
     {
-        if (e.FinishedCommands.Count() == 0)
+        if (e.FinishedCommands.Count() == 0)    // Queue initialization
+        {
             _commandQueue = [.. e.RemainingCommands];
+            StateHasChanged();
+        }
         else
-            _robotMoveProgressQueue.AdvanceProgress(e.RemainingCommands.Count());
+            _robotMoveProgressQueue.AdvanceProgress(e.FinishedCommands.Count() + 1);    // +1 to compensate for ';'
+
     }
 
     private void OnRobotEffectorsStateChanged(object sender, RobotEffectorsEventArgs e)
@@ -154,11 +160,11 @@
         Solver = algorithm.Solver();
     }
 
-    private void NextRobotStep()
+    private async Task NextRobotStep()
     {
         if(Robot.CurrentState == RobotState.NoCube)
         {
-            _moveQueue = [..Solver.SolveCube(_cube)];
+            _moveQueue = [.. (await Task.Run(() => Solver.SolveCube(_cube)))];
             Robot.SolveCube(_moveQueue);
             return;
         }

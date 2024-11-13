@@ -284,7 +284,7 @@
         _dialatePrevew = null;
         StateHasChanged();
 
-        var processorEnumerator = PhotoAnalyzerService.GetProcessedImagesStepByStep(_imageData);
+        var processorEnumerator = PhotoAnalyzerService.GetNextImageProcessingStep(_imageData);
 
         await processorEnumerator.MoveNextAsync();
         _grayscalePreview = PreviewString(processorEnumerator.Current);

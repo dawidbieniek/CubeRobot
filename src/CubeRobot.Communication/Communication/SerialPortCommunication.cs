@@ -26,7 +26,7 @@ public sealed class SerialPortCommunication : CommunicationChannelBase, IDisposa
         _port.Write(moves.ToProtocolString());
 
 #if DEBUG
-        Debug.Write("Out ");
+        Debug.Write("Sending ");
         Debug.WriteLine(moves.ToProtocolString());
 #endif
     }
@@ -37,7 +37,7 @@ public sealed class SerialPortCommunication : CommunicationChannelBase, IDisposa
         OnDataRecieved(new(data));
 
 #if DEBUG
-        Debug.Write("In  ");
+        Debug.Write("Recieved  ");
         Debug.WriteLine(data);
 #endif
     }

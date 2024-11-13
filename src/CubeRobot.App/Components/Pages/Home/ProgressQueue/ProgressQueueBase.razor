@@ -4,7 +4,10 @@
 <div class="form-group col-md-12">
     <label for="@this.GetHashCode()">@Title</label>
     <div class="progress">
-        <div class="progress-bar  progress-bar-striped @(Progress < MaxProgress ? "progress-bar-animated" : "")" style="width: @(ProgressPercent)%;">@Progress / @MaxProgress</div>
+        @{
+            string progressWidthText = ProgressPercent.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+        }
+        <div class="progress-bar progress-bar-striped @(Progress < MaxProgress ? "progress-bar-animated" : "")" style="width: @(progressWidthText)%;">@Progress / @MaxProgress</div>
     </div>
     <input id="@this.GetHashCode()" type="text" readonly class="form-control mt-1" placeholder="@Text">
 </div>
@@ -28,6 +31,9 @@
         get => _queueValue;
         private set
         {
+            if (_queueValue == value)
+                return;
+
             _queueValue = value;
 
             MaxProgress = Math.Max(_queueValue.Count, 1);
@@ -38,7 +44,7 @@
 
     public void AdvanceProgress(int progress = 1)
     {
-        if (Progress >= MaxProgress || Progress <= 0)
+        if (progress >= MaxProgress || progress <= 0)
             return;
 
         Progress += progress;
@@ -54,8 +60,7 @@
 
     protected override void OnParametersSet()
     {
-        if (QueueValue != Queue)
-            QueueValue = Queue;
+        QueueValue = Queue;
     }
 
     protected virtual void UpdateText()
