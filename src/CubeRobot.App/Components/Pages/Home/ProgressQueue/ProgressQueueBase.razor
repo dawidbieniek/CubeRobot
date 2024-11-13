@@ -4,70 +4,63 @@
 <div class="form-group col-md-12">
     <label for="@this.GetHashCode()">@Title</label>
     <div class="progress">
-        @{
+        @if(MaxProgress > 0)
+        {
             string progressWidthText = ProgressPercent.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+            string animationClass = Progress < MaxProgress ? "progress-bar-animated" : "";
+            string classes = $"overflow-visible progress-bar progress-bar-striped {animationClass}";
+            <div class="@classes" style="width: @(progressWidthText)%;">@Progress / @MaxProgress</div>
         }
-        <div class="progress-bar progress-bar-striped @(Progress < MaxProgress ? "progress-bar-animated" : "")" style="width: @(progressWidthText)%;">@Progress / @MaxProgress</div>
     </div>
     <input id="@this.GetHashCode()" type="text" readonly class="form-control mt-1" placeholder="@Text">
 </div>
 
 @code 
 {
-    private List<T> _queueValue = null!;
-
-    [Parameter, EditorRequired]
-    public List<T> Queue { get; set; } = null!;
     [Parameter]
     public string Title { get; set; } = string.Empty;
 
+    protected List<T> Queue { get; private set; } = null!;
     protected string Text { get; set; } = string.Empty;
     protected int Progress { get; set; } = 0;
+    protected int MaxProgress { get; set; } = 0;
     protected double ProgressPercent => 100D * Progress / MaxProgress;
-    protected int MaxProgress { get; set; } = 1;  // Min value should be 1. When its 0, the bar is rendered weirdly
 
-    protected List<T> QueueValue
+    public void Initialize(List<T> queue)
     {
-        get => _queueValue;
-        private set
-        {
-            if (_queueValue == value)
-                return;
+        Queue = queue;
 
-            _queueValue = value;
+        MaxProgress = queue.Count;
+        Progress = 0;
+        UpdateText();
 
-            MaxProgress = Math.Max(_queueValue.Count, 1);
-            Progress = 0;
-            UpdateText();
-        }
+        StateHasChanged();
     }
 
-    public void AdvanceProgress(int progress = 1)
+    public void AdvanceProgress(int progressChange = 1)
     {
-        if (progress >= MaxProgress || progress <= 0)
+        if (Queue is null)
+            throw new InvalidOperationException($"{GetType().Name} must be first initialized");
+
+        if (Progress >= MaxProgress || progressChange <= 0)
             return;
 
-        Progress += progress;
-        if (progress == 1)
+        Progress += progressChange;
+        if (progressChange == 1)
             Queue.RemoveAt(0);
         else
-            Queue.RemoveRange(0, progress);
+            Queue.RemoveRange(0, progressChange);
 
         UpdateText();
 
         StateHasChanged();
     }
 
-    protected override void OnParametersSet()
-    {
-        QueueValue = Queue;
-    }
-
     protected virtual void UpdateText()
     {
         StringBuilder sb = new();
 
-        foreach (T item in QueueValue)
+        foreach (T item in Queue)
         {
             sb.Append(item.ToString());
             sb.Append(' ');

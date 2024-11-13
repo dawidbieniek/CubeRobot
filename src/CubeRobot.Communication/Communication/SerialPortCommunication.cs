@@ -26,19 +26,17 @@ public sealed class SerialPortCommunication : CommunicationChannelBase, IDisposa
         _port.Write(moves.ToProtocolString());
 
 #if DEBUG
-        Debug.Write("Sending ");
-        Debug.WriteLine(moves.ToProtocolString());
+        Debug.WriteLine($"Sending '{moves.ToProtocolString()}'");
 #endif
     }
 
     private void OnPortDataRecieved(object sender, SerialDataReceivedEventArgs e)
     {
-        string data = _port.ReadExisting().ToString();
+        string data = _port.ReadExisting();
         OnDataRecieved(new(data));
 
 #if DEBUG
-        Debug.Write("Recieved  ");
-        Debug.WriteLine(data);
+        Debug.WriteLine($"Recieved '{data}'");
 #endif
     }
 }

@@ -11,7 +11,7 @@ public class CubeMoveProgressQueue : ProgressQueueBase<CubeMove>
     {
         StringBuilder sb = new();
 
-        foreach (CubeMove item in QueueValue)
+        foreach (CubeMove item in Queue)
         {
             sb.Append(item.GetDescriptor());
             sb.Append(' ');
