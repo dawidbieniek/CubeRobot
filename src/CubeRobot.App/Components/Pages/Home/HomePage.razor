@@ -88,7 +88,7 @@
     private IErrorDisplay ErrorDisplay { get; set; } = null!;
 
     private ICubeSolver Solver = new TwoPhaseSolver();
-    private Cube _cube = new(3, true);
+    private Cube _cube = new(3, initializeColors:false);
 
     private RobotMoveProgressQueue _robotMoveProgressQueue = null!; // Reference
     private CubeMoveProgressQueue _cubeMoveProgressQueue = null!; // Reference
@@ -99,7 +99,7 @@
 
     protected override void OnInitialized()
     {
-        Robot.RobotStateChanged += (s, e) => _robotState = e.CurrentState;
+        Robot.RobotStateChanged += (s, e) => InvokeAsync(() => { _robotState = e.CurrentState; StateHasChanged(); });
         Robot.MoveQueueChanged += (s, e) => InvokeAsync(() => OnRobotMoveQueueChanged(s, e));
         Robot.CommandQueueChanged += (s, e) => InvokeAsync(() => OnRobotCommandQueueChanged(s, e));
         Robot.RobotEffectorsStateChanged += (s, e) => InvokeAsync(() => OnRobotEffectorsStateChanged(s, e));

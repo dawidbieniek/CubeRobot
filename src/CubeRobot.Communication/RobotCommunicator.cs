@@ -7,6 +7,8 @@ namespace CubeRobot.Robot;
 
 internal class RobotCommunicator : IDisposable
 {
+    private const string CommunicationStartMessage = "Start";
+
     private readonly CommunicationChannelBase _communication;
     private readonly Queue<RobotMove> _commandQueue = [];
     /// <summary>
@@ -23,6 +25,7 @@ internal class RobotCommunicator : IDisposable
 
     public event CommandQueueChangedEventHandler CommandQueueChanged = delegate { };
     public event MoveQueueChangedEventHandler MoveQueueChanged = delegate { };
+    public event EventHandler CommunicationEstablished = delegate { };
 
     public void SendMovesToRobot(IEnumerable<RobotMove> robotMoves, IEnumerable<MutablePair<CubeMove, int>>? cubeMoves = null)
     {
@@ -49,6 +52,9 @@ internal class RobotCommunicator : IDisposable
 
     private void OnDataRecieved(object sender, CommunicationChannelDataEventArgs e)
     {
+        if (e.RecievedData.Contains(CommunicationStartMessage))
+            CommunicationEstablished?.Invoke(this, new());
+
         int dotCount = e.RecievedData.Count(c => c == '.');
 
         for (int i = 0; i < dotCount; i++)

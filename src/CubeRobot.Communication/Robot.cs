@@ -35,8 +35,7 @@ public class Robot : IRobot
         _communicator = new(channel);
         _communicator.MoveQueueChanged += MoveQueueChanged;
         _communicator.CommandQueueChanged += CommandQueueChanged;
-
-        CurrentState = RobotState.NoCube;
+        _communicator.CommunicationEstablished += (s, e) => CurrentState = RobotState.NoCube;
     }
 
     public void GrabCube()
