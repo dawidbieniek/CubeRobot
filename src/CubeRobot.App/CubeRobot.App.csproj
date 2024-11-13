@@ -1,17 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0-maccatalyst</TargetFrameworks>
-        <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-        <!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
-
-        <!-- Note for MacCatalyst:
-            The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-            When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-            The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-            either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-        <!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
-
+        <TargetFrameworks>net8.0-windows10.0.22621.0</TargetFrameworks>
+        
         <OutputType>Exe</OutputType>
         <RootNamespace>CubeRobot.App</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -20,50 +11,16 @@
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
         <Nullable>enable</Nullable>
 
-        <!-- Display name -->
-        <ApplicationTitle>CubeRobot.App</ApplicationTitle>
-
-        <!-- App Identifier -->
-        <ApplicationId>com.companyname.cuberobot.app</ApplicationId>
+        <ApplicationTitle>CubeRobot Controll Panel</ApplicationTitle>
+        <ApplicationId>dawidbieniek.cuberobot.app</ApplicationId>
+        <ApplicationIdGuid>94b5b312-0679-4faf-a9d1-91f08fa1f055</ApplicationIdGuid>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
 
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-    </PropertyGroup>
-
-    <PropertyGroup>
-      <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.22621.0</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
-      <ApplicationTitle>CubeRobot Controll Panel</ApplicationTitle>
-      <ApplicationId>dawidbieniek.cuberobot.app</ApplicationId>
-      <ApplicationIdGuid>94b5b312-0679-4faf-a9d1-91f08fa1f055</ApplicationIdGuid>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.22621.0|AnyCPU'">
-      <ApplicationTitle>CubeRobot Controll Panel</ApplicationTitle>
-      <ApplicationId>dawidbieniek.cuberobot.app</ApplicationId>
-      <ApplicationIdGuid>94b5b312-0679-4faf-a9d1-91f08fa1f055</ApplicationIdGuid>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
-      <ApplicationTitle>CubeRobot Controll Panel</ApplicationTitle>
-      <ApplicationId>dawidbieniek.cuberobot.app</ApplicationId>
-      <ApplicationIdGuid>94b5b312-0679-4faf-a9d1-91f08fa1f055</ApplicationIdGuid>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.22621.0|AnyCPU'">
-      <ApplicationTitle>CubeRobot Controll Panel</ApplicationTitle>
-      <ApplicationId>dawidbieniek.cuberobot.app</ApplicationId>
-      <ApplicationIdGuid>94b5b312-0679-4faf-a9d1-91f08fa1f055</ApplicationIdGuid>
     </PropertyGroup>
 
     <ItemGroup>
@@ -85,20 +42,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Components\Pages\CubeInputSettings\CubeInputSettingsPage.razor.css" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Components\Common\IErrorDisplay.cs" />
-      <Content Include="Components\Pages\CubeInputSettings\CubeInputSettingsPage.razor.css" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="BlazorSortableList" Version="2.1.0" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
     </ItemGroup>
 
     <ItemGroup>
@@ -108,11 +57,4 @@
       <ProjectReference Include="..\CubeRobot.Solvers\CubeRobot.Solvers.csproj" />
       <ProjectReference Include="..\CubeRobot.Util\CubeRobot.Util.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Content Update="Components\Pages\Test2.razor">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </Content>
-    </ItemGroup>
-
 </Project>
