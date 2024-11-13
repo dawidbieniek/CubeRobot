@@ -1,0 +1,23 @@
+﻿<div class="card">
+    <div class="card-header"><label class="h6">@Title</label></div>
+    @if (ImageData is not null)
+    {
+        <img src="@ImageData" class="card-img-bottom" alt="@Title" />
+    }
+    @if(ChildContent is not null)
+    {
+        <div class="card-footer p-1">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@code 
+{
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = null!;
+    [Parameter]
+    public string? ImageData { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+}

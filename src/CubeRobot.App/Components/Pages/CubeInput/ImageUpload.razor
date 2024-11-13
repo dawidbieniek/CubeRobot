@@ -1,20 +1,21 @@
 ﻿@using BlazorSortableList
 @using CubeRobot.App.Components.Pages.CubeInput.ImageDrop
+@using CubeRobot.Models.RubiksCube
 
-    @* Upload button *@
+@* Upload button *@
 <label for="filePicker" class="btn btn-primary mt-2">
     <span class="title">Prześlij obrazy</span>
     <InputFile id="filePicker" OnChange="UploadFiles" multiple accept="image/*" class="invisible" style="width:0px;"></InputFile>
 </label>
     
 <div class="row-parent">
-    <SortableList Id="@_group.UploadListId" GroupModel="_group" T="ImageFile" Style="min-height:100px; background-color:lightgray; border-radius:5px; overflow:hidden;">
+    <SortableList Id="@_cubeFaceImageGroup.UploadListId" GroupModel="_cubeFaceImageGroup" T="ImageFile" Style="min-height:100px; background-color:lightgray; border-radius:5px; overflow:hidden;">
         <SortableItemTemplate>
             <div class="col-md-2">
                 <div class="card">
                     <div class="card-header">
                         @context.FileName
-                        <button @onclick="() => RemoveImage(context)" class="btn-close position-absolute end-0  " style="top:8px !important;"></button>
+                        <button @onclick="() => RemoveImage(context)" class="btn-close position-absolute end-0" style="top:8px !important;"></button>
                     </div>
                     <img src="@context.Preview" class="card-img-bottom" alt="@context.FileName" />
                 </div>
@@ -25,14 +26,13 @@
 
 <div class="row mt-2">
     <div class="col-md-8">
-        <ImageDropCubeNet Group="_group"  />
+        <ImageDropCubeNet Group="_cubeFaceImageGroup"  />
     </div>
     <div class="col-md-4">
-            <button class="btn btn-primary">Analizuj obrazy</button>
-            <button class="btn btn-secondary mt-1">Ustawienia analizy</button>
+        <button class="btn btn-primary" @onclick="Analyze">Analizuj obrazy</button>
+        <button class="btn btn-secondary mt-1" @onclick="GoToSettings">Ustawienia analizy</button>
     </div>
 </div>
-
 
 @code
 {
@@ -41,17 +41,24 @@
 
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = null!;
+    [Inject]
+    public NavigationManager Navigation { get; set; } = null!;
+    [Inject]
+    public IPhotoAnalyzerService PhotoAnalyzerService { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<string> OnCubeConfigurationChanged{ get; set; }
 
     [CascadingParameter]
     private IErrorDisplay ErrorDisplay { get; set; } = null!;
 
-    private CubeSortableListGroup _group = null!;
+    private CubeSortableListGroup _cubeFaceImageGroup = null!;
 
     private List<ImageFile> _uploadedImages = [];
 
     protected override void OnInitialized()
     {
-        _group = new(() => StateHasChanged(), _uploadedImages);
+        _cubeFaceImageGroup = new(() => StateHasChanged(), _uploadedImages);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -79,13 +86,18 @@
                     return;
                 }
 
-                ImageFile image = new(ShortenFileName(file.Name), await LoadImagePreview(file));
+                (string dataId, byte[] rawData) = await LoadImagePreview(file);
+                ImageFile image = new(ShortenFileName(file.Name), dataId, rawData);
                 _uploadedImages.Add(image);
             }
         }
         catch (InvalidOperationException)
         {
             ErrorDisplay.AddErrors($"Can't upload more than {MaxFileCount} files");
+        }
+        catch (IOException ex)
+        {
+            ErrorDisplay.AddErrors($"Cannot upload file ({ex.Message})");
         }
 
     }
@@ -96,13 +108,12 @@
         return nameWithoutExtension[0..Math.Min(nameWithoutExtension.Length, MaxFileNameLength)];
     }
 
-    private async Task<string> LoadImagePreview(IBrowserFile file)
+    private async Task<(string dataId, byte[] rawData)> LoadImagePreview(IBrowserFile file)
     {
         byte[] buffer = new byte[file.Size];
-        await file.OpenReadStream().ReadAsync(buffer);
+        await file.OpenReadStream(maxAllowedSize: 16 * 1024 * 1024).ReadAsync(buffer);   // Allow 16MB files
 
-        string imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
-        return imageDataUrl;
+        return ($"data:{file.ContentType};base64,", buffer);
     }
 
     private void RemoveImage(ImageFile image)
@@ -113,5 +124,37 @@
     private void ShowUploadDialog()
     {
 
+    }
+
+    private async Task Analyze()
+    {
+        try
+        {
+            var imageDataNet = _cubeFaceImageGroup.GetCubeNetImageData();
+
+            CubeBuilder cubeBuilder = new(3);
+            foreach (CubeFace face in (CubeFace[])Enum.GetValues<CubeFace>())
+            {
+                if (imageDataNet[face] is null)
+                {
+                    cubeBuilder.SetFace(face, null);
+                    continue;
+                }
+
+                CubeFaceColor[,] faceColors = PhotoAnalyzerService.ExtractColorsFromImage(imageDataNet[face]!.RawData);
+                cubeBuilder.SetFace(face, faceColors);
+            }
+
+            await OnCubeConfigurationChanged.InvokeAsync(cubeBuilder.Build().ToString());
+        }
+        catch(Exception ex)
+        {
+            ErrorDisplay.AddErrors(ex.Message);
+        }
+    }
+
+    private void GoToSettings()
+    {
+        Navigation.NavigateTo("/cube-input/settings");
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/settings/robot"
+﻿@* @page "/settings/robot"
 @using CubeRobot.CV
 @using CubeRobot.Models.RubiksCube
 
@@ -69,7 +69,7 @@
         }
 
         byte[] imageData = new byte[file.Size];
-        await file.OpenReadStream().ReadAsync(imageData);
+        await file.OpenReadStream(maxAllowedSize:16*1024*1024).ReadAsync(imageData);
         _imageData = imageData;
         _fileType = file.ContentType.ToString();
 
@@ -78,13 +78,16 @@
 
     private void ProcessImage()
     {
-        byte[] matData = PhotoAnalyzer.ProcessCubeImage(_imageData, out byte[,][] imageFragmentsData, out _faceColors);
+        byte[] matData = new PhotoAnalyzer().ProcessCubeImage(_imageData, out byte[,][] imageFragmentsData, out _faceColors);
         _matPreview = $"data:{_fileType};base64,{Convert.ToBase64String(matData)}";
 
-        _imageFragments = new string[imageFragmentsData.GetLength(0), imageFragmentsData.GetLength(1)];
-        for (int i = 0; i < imageFragmentsData.GetLength(0); i++)
-            for (int j = 0; j < imageFragmentsData.GetLength(1); j++)
-                _imageFragments[i, j] = $"data:{_fileType};base64,{Convert.ToBase64String(imageFragmentsData[i, j])}";
+        if (imageFragmentsData.GetLength(0) > 0)
+        {
+            _imageFragments = new string[imageFragmentsData.GetLength(0), imageFragmentsData.GetLength(1)];
+            for (int i = 0; i < imageFragmentsData.GetLength(0); i++)
+                for (int j = 0; j < imageFragmentsData.GetLength(1); j++)
+                    _imageFragments[i, j] = $"data:{_fileType};base64,{Convert.ToBase64String(imageFragmentsData[i, j])}";
+        }
     }
 
-}
+} *@

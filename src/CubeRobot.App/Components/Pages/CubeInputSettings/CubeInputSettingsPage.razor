@@ -1,0 +1,335 @@
+﻿@page "/cube-input/settings"
+
+@using CubeRobot.CV
+@using CubeRobot.Models.RubiksCube
+
+
+<NavBar Title="Konfiguracja kostki" OnBackClicked="GoBackToInput" />
+
+<div class="container p-2 border border-1 mt-2">
+    <div class="row"><h4>Wstępne przetwarzanie obrazu</h4></div>
+    <div class="row row-cols-lg-4 row-cols-md-2 mb-2 g-2">
+        <div class="col">
+            <ImageCard Title="Oryginał" ImageData="@_originalPreview" />
+        </div>
+        <div class="col">
+            <ImageCard Title="Szarość" ImageData="@_grayscalePreview" />
+        </div>
+        <div class="col">
+            <ImageCard Title="Usuwanie szumu" ImageData="@_denoisePreview" >
+                <div class="container p-0">
+                    <div class="row">
+                        <label for="useDenoising" class="col-6 col-form-label">Włącz</label>
+                        <div class="col-6">
+                            <InputCheckbox id="useDenoising" @bind-Value="_settings.UseDenoising" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="denoisingStrength" class="col-6 col-form-label">Siła</label>
+                        <div class="col-6">
+                            <InputNumber id="denoisingStrength" @bind-Value="_settings.DenoisingStrength" class="w-100"/>
+                        </div>
+                    </div>
+                </div>
+            </ImageCard>
+        </div>
+        <div class="col">
+            <ImageCard Title="Rozmycie" ImageData="@_blurPreview">
+                <div class="container p-0">
+                    <div class="row">
+                        <label for="blurType" class="col-6 col-form-label">Typ rozmycia</label>
+                        <div class="col-6">
+                            <InputSelect id="blurType" class="w-100" style="line-height:24px; padding:2px 1px;" @bind-Value="_settings.BlurType">
+                                @foreach(var value in Enum.GetValues<PreprocessingSettings.BlurTypes>())
+                                {
+                                    <option value="@value">@value.GetDescriptor()</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="blurSize" class="col-6 col-form-label">Wielkość</label>
+                        <div class="col-6">
+                            <InputNumber id="blurSize" @bind-Value="_settings.BlurKernelSize" class="w-100" />
+                        </div>
+                    </div>
+                </div>
+            </ImageCard>
+        </div>
+        <div class="col">
+            <ImageCard Title="Detekcja krawędzi" ImageData="@_cannyPreview">
+                <div class="container p-0">
+                    <div class="row">
+                        <label for="useCanny" class="col-6 col-form-label">Włącz</label>
+                        <div class="col-6">
+                            <InputCheckbox id="useCanny" @bind-Value="_settings.UseCannyDetection" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="cannyLower" class="col-6 col-form-label">Dolny próg</label>
+                        <div class="col-6">
+                            <InputNumber id="cannyLower" @bind-Value="_settings.CannyLowerThreshold" class="w-100" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="cannyUpper" class="col-6 col-form-label">Górny próg</label>
+                        <div class="col-6">
+                            <InputNumber id="cannyUpper" @bind-Value="_settings.CannyUpperThreshold" class="w-100" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="cannySize" class="col-6 col-form-label">Wielkość</label>
+                        <div class="col-6">
+                            <InputNumber id="cannySize" @bind-Value="_settings.CannySobelOperatorValue" class="w-100" />
+                        </div>
+                    </div>
+                </div>
+            </ImageCard>
+        </div>
+        <div class="col">
+            <ImageCard Title="Rozszerzenie krawędzi" ImageData="@_dialatePrevew">
+                <div class="container p-0">
+                    <div class="row">
+                        <label for="useDialation" class="col-6 col-form-label">Włącz</label>
+                        <div class="col-6">
+                            <InputCheckbox id="useDialation" @bind-Value="_settings.UseDialation" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="dialationShape" class="col-6 col-form-label">Kształt</label>
+                        <div class="col-6">
+                            <InputSelect id="dialationShape" class="w-100" style="line-height:24px; padding:2px 1px;" @bind-Value="_settings.DialationShape">
+                                @foreach (var value in Enum.GetValues<PreprocessingSettings.Shape>())
+                                {
+                                    <option value="@value">@value.GetDescriptor()</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="dialationSize" class="col-6 col-form-label">Wielkość</label>
+                        <div class="col-6">
+                            <InputNumber id="dialationSize" @bind-Value="_settings.DialationSize" class="w-100" />
+                        </div>
+                    </div>
+                </div>
+            </ImageCard>
+        </div>
+    </div>
+    <div class="row">
+        <div class="d-flex">
+            <div class="me-2">
+                <label for="filePicker" class="btn btn-primary flex-grow-0">
+                    <span class="title">Prześlij obraz</span>
+                    <InputFile id="filePicker" OnChange="UploadFile" accept="image/*" class="invisible" style="width:0px;"></InputFile>
+                </label>
+            </div>
+            @if (_imageData is null)
+            {
+                <button class="btn btn-primary flex-grow-0 disabled">Przetwórz obraz</button>
+            }
+            else
+            {
+                <button class="btn btn-primary flex-grow-0" @onclick="ProcessImage">Przetwórz obraz</button>
+            }
+            <div class="flex-grow-1 invisible" />
+        </div>
+    </div>
+</div>
+
+<div class="container p-2 border border-1">
+    <div class="row"><h4>Odnajdowanie bloków kostki</h4></div>
+    <div class="row row-cols-lg-4 row-cols-md-2 mb-2 g-2">
+        <div class="col">
+            <div class="card">
+                <div class="card-header"><label class="h6">Przetworzony obraz</label></div>
+                @if (_processedImagePreview is not null)
+                {
+                    <img src="@_processedImagePreview" class="card-img-bottom" alt="Przetworzony obraz" />
+                }
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header"><label class="h6">Fragmenty</label></div>
+                @if (_imageFragments is not null)
+                {
+                    @if (_imageFragments.Length == 0)
+                    {
+                        <span class="mx-auto">Brak</span>
+                    }
+                    else
+                    {
+                        @for (int i = 0; i < _imageFragments.GetLength(0); i++)
+                        {
+                            <div class="row">
+                                @for (int j = 0; j < _imageFragments.GetLength(1); j++)
+                                {
+                                    <div class="col">
+                                        <img src="@_imageFragments[i,j]" class="w-100 h-100" />
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header"><label class="h6">Kolory</label></div>
+                @if (_faceColors is not null)
+                {
+                    @if (_faceColors.Length == 0)
+                    {
+                        <span class="mx-auto">Brak</span>
+                    }
+                    else
+                    {
+                        @for (int i = 0; i < _faceColors.GetLength(0); i++)
+                        {
+                            <div class="row">
+                                @for (int j = 0; j < _faceColors.GetLength(1); j++)
+                                {
+                                    <div class="col">
+                                        <h6>@_faceColors[i, j]</h6>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="d-flex">
+            @if (_imageData is null)
+            {
+                <button class="btn btn-primary flex-grow-0 disabled">Szukaj bloków</button>
+            }
+            else
+            {
+                <button class="btn btn-primary flex-grow-0" @onclick="ProcessBlocks">Szukaj bloków</button>
+            }
+            <div class="flex-grow-1 invisible" />
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private string _imageFileDataType = string.Empty;
+    private byte[]? _imageData = null;
+
+    private string? _originalPreview = null;
+    private string? _grayscalePreview = null;
+    private string? _denoisePreview = null;
+    private string? _blurPreview = null;
+    private string? _cannyPreview = null;
+    private string? _dialatePrevew = null;
+
+    private PreprocessingSettings _settings = new();
+
+    private string[,] _imageFragments = new string[0, 0];
+    CubeFaceColor[,] _faceColors = new CubeFaceColor[0, 0];
+    private string? _processedImagePreview = null;
+
+    [Inject]
+    public IPhotoAnalyzerService PhotoAnalyzerService { get; set; } = null!;
+    [Inject]
+    public NavigationManager Navigation{ get; set; } = null!;
+
+    [CascadingParameter]
+    private IErrorDisplay ErrorDisplay { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        _settings = PhotoAnalyzerService.Settings;
+    }
+
+    private async Task UploadFile(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount == 0)
+            return;
+        try
+        {
+            IBrowserFile file = e.GetMultipleFiles(1).First();
+            _imageData = new byte[file.Size];
+            await file.OpenReadStream(maxAllowedSize: 16 * 1024 * 1024).ReadAsync(_imageData);   // Allow 16MB files
+            _imageFileDataType = $"data:{file.ContentType};base64,";
+
+            _originalPreview = PreviewString(_imageData);
+            _grayscalePreview = null;
+            _denoisePreview = null;
+            _blurPreview = null;
+            _cannyPreview = null;
+            _dialatePrevew = null;
+        }
+        catch (IOException ex)
+        {
+            ErrorDisplay.AddErrors($"Cannot upload file ({ex.Message})");
+        }
+    }
+
+    private async Task ProcessImage()
+    {
+        if (_imageData is null)
+            return;
+
+        _grayscalePreview = null;
+        _denoisePreview = null;
+        _blurPreview = null;
+        _cannyPreview = null;
+        _dialatePrevew = null;
+        StateHasChanged();
+
+        var processorEnumerator = PhotoAnalyzerService.GetProcessedImagesStepByStep(_imageData);
+
+        await processorEnumerator.MoveNextAsync();
+        _grayscalePreview = PreviewString(processorEnumerator.Current);
+        StateHasChanged();
+        await processorEnumerator.MoveNextAsync();
+        _denoisePreview = PreviewString(processorEnumerator.Current);
+        StateHasChanged();
+        await processorEnumerator.MoveNextAsync();
+        _blurPreview = PreviewString(processorEnumerator.Current);
+        StateHasChanged();
+        await processorEnumerator.MoveNextAsync();
+        _cannyPreview = PreviewString(processorEnumerator.Current);
+        StateHasChanged();
+        await processorEnumerator.MoveNextAsync();
+        _dialatePrevew = PreviewString(processorEnumerator.Current);
+    }
+
+    private async Task ProcessBlocks()
+    {
+        if (_imageData is null)
+            return;
+
+        _imageFragments = new string[0, 0]; 
+        _faceColors = new CubeFaceColor[0, 0];
+        StateHasChanged();
+
+        PhotoAnalyzer.FragmentData fragmentData = new();
+        await Task.Run(() => fragmentData = PhotoAnalyzerService.ExtractFragmentDataFromImage(_imageData));
+
+        _processedImagePreview = PreviewString(fragmentData.ProcessedImageRawData);
+        _faceColors = fragmentData.FragmentColors;
+        _imageFragments = new string[fragmentData.FragmentImageRawData.GetLength(0), fragmentData.FragmentImageRawData.GetLength(1)];
+
+        for (int i = 0; i < _imageFragments.GetLength(0); i++)
+            for (int j = 0; j < _imageFragments.GetLength(1); j++)
+                _imageFragments[i, j] = PreviewString(fragmentData.FragmentImageRawData[i, j]);
+    }
+
+    private void GoBackToInput()
+    {
+        Navigation.NavigateTo("/cube-input");
+    }
+
+
+    private string PreviewString(byte[] data) => _imageData is null
+        ? string.Empty
+        : _imageFileDataType + Convert.ToBase64String(data);
+}

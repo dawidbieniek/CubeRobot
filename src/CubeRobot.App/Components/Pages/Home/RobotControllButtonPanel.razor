@@ -1,10 +1,14 @@
 ﻿@using CubeRobot.Robot
 
-<button type="button" class="btn btn-secondary me-2" disabled>Pomiń krok</button>
-<button type="button" class="btn btn-primary">Następny krok</button>
+<button type="button" class="btn btn-secondary me-2" disabled @onclick="OnSkipStep">Pomiń krok</button>
+<button type="button" class="btn btn-primary" @onclick="OnNextStep">Następny krok</button>
 
 @code 
 {
     [Parameter]
     public RobotState RobotState { get; set; }
+    [Parameter]
+    public EventCallback OnSkipStep { get; set; }
+    [Parameter]
+    public EventCallback OnNextStep { get; set; }
 }

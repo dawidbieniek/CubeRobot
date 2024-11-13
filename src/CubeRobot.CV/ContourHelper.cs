@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+
 using OpenCvSharp;
 
 namespace CubeRobot.CV;
+
 internal static class ContourHelper
 {
+    public static List<Rect> FilterContours(Point[][] contours, int maxBlockSize) => FilterContoursByShape(contours, maxBlockSize);
 
-    public static List<Rect> FilterContours(Point[][] contours) => FilterContoursByShape(contours);
-    public static List<Rect> FilterAndDrawContours(Point[][] contours, Mat output) => FilterContoursByShape(contours, output);
+    public static List<Rect> FilterAndDrawContours(Point[][] contours, int maxBlockSize, Mat output) => FilterContoursByShape(contours, maxBlockSize, output);
 
-    public static List<List<Rect> SortContoursByPosition(List<Rect> contours)
+    public static List<List<Rect>> SortContoursByPosition(List<Rect> contours)
     {
         if (contours.Count == 0)
             return [];
@@ -35,7 +32,7 @@ internal static class ContourHelper
             {
                 sortedBoundingRects.Add([.. row.Values]);
                 relativeY = boundingRect.Y;
-                row = new() { { boundingRect.X, boundingRect} };
+                row = new() { { boundingRect.X, boundingRect } };
             }
         }
         sortedBoundingRects.Add([.. row.Values]);
@@ -43,7 +40,7 @@ internal static class ContourHelper
         return sortedBoundingRects;
     }
 
-    private static List<Rect> FilterContoursByShape(Point[][] contours, Mat? drawingOutput = null)
+    private static List<Rect> FilterContoursByShape(Point[][] contours, int maxBlockSize, Mat? drawingOutput = null)
     {
         List<Rect> blocksBoundingRects = [];
         foreach (Point[] contour in contours)
@@ -58,10 +55,10 @@ internal static class ContourHelper
 
                 Debug.WriteLine($"R: {ratio} A: {area}");
 
-                if (ratio >= 0.8 && ratio <= 1.21 && boundingRect.Width >= 20 && boundingRect.Width <= 60 && area >= 400)
+                if (ratio >= 0.8 && ratio <= 1.21 && boundingRect.Width >= maxBlockSize / 3 && boundingRect.Width <= maxBlockSize && area >= Math.Pow(maxBlockSize / 2, 2))
                 {
                     blocksBoundingRects.Add(boundingRect);
-                    if(drawingOutput is not null)
+                    if (drawingOutput is not null)
                         Cv2.DrawContours(drawingOutput, [approx], -1, new(0, 255, 255));
                 }
             }

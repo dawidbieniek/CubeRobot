@@ -85,7 +85,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Components\Pages\CubeInputSettings\CubeInputSettingsPage.razor.css" />
+    </ItemGroup>
+
+    <ItemGroup>
       <Content Include="Components\Common\IErrorDisplay.cs" />
+      <Content Include="Components\Pages\CubeInputSettings\CubeInputSettingsPage.razor.css" />
     </ItemGroup>
 
     <ItemGroup>
