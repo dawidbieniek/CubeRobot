@@ -1,3 +1,6 @@
+#ifndef Command_H
+#define Command_H
+
 const char COMMAND_STOP = 'q';
 const char COMMAND_ROTATE_FRONT_CW = 'F';
 const char COMMAND_ROTATE_FRONT_CCW = 'f';
@@ -15,6 +18,7 @@ const char COMMAND_MOVE_LEFT_FORWARD = 'A';
 const char COMMAND_MOVE_LEFT_BACKWARD = 'a';
 const char COMMAND_MOVE_BACK_FORWARD = 'W';
 const char COMMAND_MOVE_BACK_BACKWARD = 'w';
+const char COMMAND_ESTABLISH_CONNECTION = '?';
 
 const char validCommands[] = {
     COMMAND_STOP,
@@ -34,4 +38,6 @@ const char validCommands[] = {
     COMMAND_MOVE_LEFT_BACKWARD,
     COMMAND_MOVE_BACK_FORWARD,
     COMMAND_MOVE_BACK_BACKWARD,
+    COMMAND_ESTABLISH_CONNECTION,
 };
+#endif // Command_H

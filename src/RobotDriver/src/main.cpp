@@ -2,6 +2,7 @@
 #include <AccelStepper.h>
 
 #include "command.hpp"
+#include "serialHandler.hpp"
 
 const int SIDE_FRONT = 0;
 const int SIDE_RIGHT = 1;
@@ -17,47 +18,40 @@ const int ROTOR_ACCEL = 200;
 const int MOVER_SPEED = 1000;
 const int MOVER_ACCEL = 200;
 
-const char SEPARATOR_CHAR = ';';
-const char READY_CHAR = '.';
-
-AccelStepper rotors[4] =
-    {
-        AccelStepper(AccelStepper::FULL4WIRE, 51, 53, 50, 52), // FR
-        AccelStepper(AccelStepper::FULL4WIRE, 35, 37, 34, 36), // RR
-        AccelStepper(AccelStepper::FULL4WIRE, 43, 45, 42, 44), // LR
-        AccelStepper(AccelStepper::FULL4WIRE, 27, 29, 26, 28), // BR
+AccelStepper rotors[4] = {
+    AccelStepper(AccelStepper::FULL4WIRE, 51, 53, 50, 52), // FR
+    AccelStepper(AccelStepper::FULL4WIRE, 35, 37, 34, 36), // RR
+    AccelStepper(AccelStepper::FULL4WIRE, 43, 45, 42, 44), // LR
+    AccelStepper(AccelStepper::FULL4WIRE, 27, 29, 26, 28), // BR
 };
 
-AccelStepper movers[4] =
-    {
-        AccelStepper(AccelStepper::FULL4WIRE, 47, 49, 46, 48), // FM
-        AccelStepper(AccelStepper::FULL4WIRE, 31, 33, 30, 32), // RM
-        AccelStepper(AccelStepper::FULL4WIRE, 39, 41, 38, 40), // LM
-        AccelStepper(AccelStepper::FULL4WIRE, 23, 25, 22, 24), // BM
+AccelStepper movers[4] = {
+    AccelStepper(AccelStepper::FULL4WIRE, 47, 49, 46, 48), // FM
+    AccelStepper(AccelStepper::FULL4WIRE, 31, 33, 30, 32), // RM
+    AccelStepper(AccelStepper::FULL4WIRE, 39, 41, 38, 40), // LM
+    AccelStepper(AccelStepper::FULL4WIRE, 23, 25, 22, 24), // BM
 };
-
-bool readNewCommand = true;
-
-bool needToSendReady = false;
 
 void initMotors();
 void runMotors();
-void handleSerial();
 bool validateCommand(String cmd);
 void parseCommand(String cmd);
+bool test(String c)
+{
+  return true;
+}
+SerialHandler serialHandler = SerialHandler(test, parseCommand);
 
 void setup()
 {
   initMotors();
-
-  Serial.begin(9600);
-  Serial.println("Start");
+  serialHandler.start();
 }
 
 void loop()
 {
   runMotors();
-  handleSerial();
+  serialHandler.loop();
 }
 
 void initMotors()
@@ -73,8 +67,8 @@ void initMotors()
 
 void runMotors()
 {
-  bool prevReadNewCommand = readNewCommand;
-  readNewCommand = true;
+  bool prevCanAcceptNewCommand = serialHandler.canAcceptNewCommand();
+  bool readNewCommand = true;
 
   for (int i = 0; i < 4; i++)
   {
@@ -88,44 +82,8 @@ void runMotors()
   }
 
   // If ready has changed in this iteration -> inform that need to send info to Serial
-  if (prevReadNewCommand == false && readNewCommand == true)
-    needToSendReady = true;
-}
-
-void handleSerial()
-{
-  if (needToSendReady)
-  {
-    Serial.println(READY_CHAR);
-    needToSendReady = false;
-  }
-
-  while (readNewCommand && Serial.available() > 0)
-  {
-    String cmd = Serial.readStringUntil(SEPARATOR_CHAR);
-#ifdef DEBUG
-    Serial.print("Command: ");
-    Serial.println(cmd);
-#endif // DEBUG
-
-    // If command is empty -> check next in line
-    if (cmd.length() == 0)
-      continue;
-
-    if (validateCommand(cmd))
-    {
-      parseCommand(cmd);
-      readNewCommand = false;
-    }
-#ifdef DEBUG
-    else // Write back invalid command
-    {
-      Serial.print("!: '");
-      Serial.print(cmd);
-      Serial.println("'");
-    }
-#endif // DEBUG
-  }
+  if (prevCanAcceptNewCommand == false && readNewCommand == true)
+    serialHandler.finishCommand();
 }
 
 bool validateCommand(String cmd)
@@ -155,13 +113,6 @@ void parseCommand(String cmd)
   {
     switch (cmd.charAt(i))
     {
-    case COMMAND_STOP:
-      for (unsigned int i = 0; i < 4; i++)
-      {
-        rotors[i].stop();
-        movers[i].stop();
-      }
-      break;
     case COMMAND_ROTATE_FRONT_CW:
       rotors[SIDE_FRONT].move(-QUATER_SPIN); // For some reason front rotor is moving backwars??
       break;
