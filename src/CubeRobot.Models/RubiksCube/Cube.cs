@@ -5,7 +5,7 @@ namespace CubeRobot.Models.RubiksCube;
 public class Cube
 {
     public const int NumberOfFaces = 6;
-    private static readonly CubeFace[] CubeFaceStringConvertOrder = [CubeFace.Up, CubeFace.Right, CubeFace.Front, CubeFace.Down, CubeFace.Left, CubeFace.Back];
+    public static readonly CubeFace[] CubeFaceStringConvertOrder = [CubeFace.Up, CubeFace.Right, CubeFace.Front, CubeFace.Down, CubeFace.Left, CubeFace.Back];
 
     private readonly CubeRotationHelper _rotationHelper;
 

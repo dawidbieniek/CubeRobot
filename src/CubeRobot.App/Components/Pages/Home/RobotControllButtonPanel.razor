@@ -1,13 +1,17 @@
 ﻿@using CubeRobot.Robot
 
-<button type="button" class="btn btn-secondary me-2" disabled="@_skipButtonDisabled" @onclick="OnSkipStep">Pomiń krok</button>
-<button type="button" class="btn btn-primary" disabled="@_nextButtonDisabled" @onclick="OnNextStep">Następny krok</button>
+<button type="button" class="btn btn-secondary me-2" disabled="@_skipButtonDisabled" @onclick="OnSkipStep">@_skipButtonText</button>
+<button type="button" class="btn btn-primary" disabled="@_nextButtonDisabled" @onclick="OnNextStep">@_nextButtonText</button>
 
 @code 
 {
+    private const string NextStateDefaultText = "Następny krok";
+    private const string SkipStateStateDefaultText = "Pomiń krok";
+
     private bool _nextButtonDisabled = false;
     private bool _skipButtonDisabled = false;
-
+    private string _nextButtonText = NextStateDefaultText;
+    private string _skipButtonText = SkipStateStateDefaultText;
 
     [Parameter]
     public RobotState RobotState { get; set; }
@@ -23,33 +27,69 @@
         switch(RobotState)
         {
             case RobotState.Disconnected:
+                _nextButtonText = NextStateDefaultText;
+                _skipButtonText = SkipStateStateDefaultText;
                 _nextButtonDisabled = true;
                 _skipButtonDisabled = true;
                 break;
             case RobotState.NoCube:
+                _nextButtonText = "Chwyć kostkę";
                 _nextButtonDisabled = false;
-                _skipButtonDisabled = true;
+                _skipButtonDisabled = false;
                 break;
             case RobotState.ReadyForPhotos:
+                _nextButtonText = "Rozpocznij prezentację (Góra)";
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+            break;
             case RobotState.Presenting1:
+                _nextButtonText = "Następna ściana (Prawo)";
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
             case RobotState.Presenting2:
+                _nextButtonText = "Następna ściana (Przód)";
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
             case RobotState.Presenting3:
+                _nextButtonText = "Następna ściana (Dół)";
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
             case RobotState.Presenting4:
+                _nextButtonText = "Następna ściana (Lewo)";
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
             case RobotState.Presenting5:
+                _nextButtonText = "Następna ściana (Tył)";
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
             case RobotState.Presenting6:
+                _nextButtonText = "Przygotuj do układania";
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
+            case RobotState.ReadyForSolve:
+                _nextButtonText = "Ułóż kostkę";
                 _nextButtonDisabled = false;
                 _skipButtonDisabled = false;
                 break;
             case RobotState.Solving:
                 // TODO: Disable until solved?
+                _nextButtonText = NextStateDefaultText;
                 _nextButtonDisabled = false;
                 _skipButtonDisabled = false;
                 break;
             case RobotState.ReadyForRelease:
+                _nextButtonText = "Wypuść kostkę";
                 _nextButtonDisabled = false;
                 _skipButtonDisabled = false;
                 break;
             case RobotState.Resetting:
+                _nextButtonText = NextStateDefaultText;
                 _nextButtonDisabled = true;
                 _skipButtonDisabled = true;
                 break;

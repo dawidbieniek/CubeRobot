@@ -9,6 +9,7 @@ public class Robot : IRobot
 {
     private readonly RobotStateManager _stateManager = new();
     private readonly CubeMoveProcessor _moveProcessor = new();
+    private CubePresenter? _cubePresenter;
     private RobotCommunicator? _communicator;
 
     public event RobotStateChangedEventHandler RobotStateChanged
@@ -46,40 +47,66 @@ public class Robot : IRobot
         CheckIfCommunicatorInitialized();
 
         _communicator!.SendMovesToRobot([.. HighLevelRobotMove.Grab, RobotMove.Separator]);
-        _moveProcessor.SetMovers(MoverState.Close, MoverState.Close, MoverState.Close, MoverState.Close);
 
-        CurrentState = RobotState.ReadyForPhotos;
+        CommandQueueChangedEventHandler onCommandQueueChanged = delegate { };
+        
+        onCommandQueueChanged = (s, e) => 
+        {
+            if (e.RemainingCommands.Any())
+                return;
+
+            _communicator.CommandQueueChanged -= onCommandQueueChanged;
+            _moveProcessor.SetMovers(MoverState.Close, MoverState.Close, MoverState.Close, MoverState.Close);
+            CurrentState = RobotState.ReadyForPhotos;
+        };
+
+        _communicator.CommandQueueChanged += onCommandQueueChanged;
     }
 
-    public void PresentCube(CubeFace face)
+    public void StartPresenting()
     {
         CheckIfCommunicatorInitialized();
+        _cubePresenter = new(_communicator!, _stateManager);
 
-        throw new NotImplementedException();
-        //switch (face)
-        //{
-        //	case CubeFace.Up:
-        //		CurrentState = RobotState.Presenting1;
-        //		break;
-
-        // case CubeFace.Front: CurrentState = RobotState.Presenting2; break;
-
-        // case CubeFace.Down: CurrentState = RobotState.Presenting3; break;
-
-        // case CubeFace.Back: CurrentState = RobotState.Presenting4; break;
-
-        // case CubeFace.Left: CurrentState = RobotState.Presenting5; break;
-
-        //	case CubeFace.Right:
-        //		CurrentState = RobotState.Presenting6;
-        //		break;
-        //}
+        _cubePresenter.NextFace();
     }
 
-    public void StopPresenting()
+    public void NextPresentationStep()
     {
-        throw new NotImplementedException();
-        // TODO: Move cube to initial position
+        CheckIfCommunicatorInitialized();
+        _cubePresenter?.NextFace();
+    }
+
+    public void SkipState()
+    {
+        switch (CurrentState)
+        {
+            case RobotState.NoCube:
+                CurrentState = RobotState.ReadyForPhotos;
+                break;
+            case RobotState.ReadyForPhotos:
+            case RobotState.Presenting1:
+            case RobotState.Presenting2:
+            case RobotState.Presenting3:
+            case RobotState.Presenting4:
+            case RobotState.Presenting5:
+            case RobotState.Presenting6:
+                if (_cubePresenter is not null)
+                    _cubePresenter.StopPresentation();
+                else
+                    CurrentState = RobotState.ReadyForSolve;
+                break;
+            case RobotState.ReadyForSolve:
+                CurrentState = RobotState.ReadyForRelease;
+                break;
+            case RobotState.Solving:
+                // TODO: Stop solving
+                CurrentState = RobotState.ReadyForRelease;
+                break;
+            case RobotState.ReadyForRelease:
+                CurrentState = RobotState.NoCube;
+                break;
+        }
     }
 
     public void SolveCube(IEnumerable<CubeMove> moves)

@@ -19,9 +19,10 @@ public interface IRobot
 
     public void GrabCube();
 
-    public void PresentCube(CubeFace face);
+    public void StartPresenting();
+    public void NextPresentationStep();
 
-    public void StopPresenting();
+    public void SkipState();
 
     public void SolveCube(IEnumerable<CubeMove> moves);
 

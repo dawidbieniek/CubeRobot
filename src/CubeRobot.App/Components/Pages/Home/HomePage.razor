@@ -43,7 +43,7 @@
                     <div class="form-row row">
                         <div class="form-group col-md-6">
                             <label for="timeToFind">Czas znalezienia rozwiązania kostki</label>
-                            <input type="text" readonly class="form-control" id="timeToFind" placeholder="to be done">
+                            <input type="text" readonly class="form-control" id="timeToFind" placeholder="@_solveTimeText">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="timeToSolve">Czas ułożenia kostki</label>
@@ -97,6 +97,8 @@
     private RobotState _robotState = RobotState.Disconnected;
     private RotorState[] _robotRotors = Enumerable.Repeat(RotorState.Unknown, 4).ToArray();
     private MoverState[] _robotMovers = Enumerable.Repeat(MoverState.Unknown, 4).ToArray();
+
+    private string _solveTimeText = "00:00";
 
     protected override void OnInitialized()
     {
@@ -167,17 +169,55 @@
 
     private async Task NextRobotStep()
     {
-        if(Robot.CurrentState == RobotState.NoCube)
+        switch(Robot.CurrentState)
         {
-            IEnumerable<CubeMove> moveQueue = [.. (await Task.Run(() => Solver.SolveCube(_cube)))];
-            Robot.SolveCube(moveQueue);
-            return;
+            case RobotState.NoCube:
+                Robot.GrabCube();
+                break;
+            case RobotState.ReadyForPhotos:
+                Robot.StartPresenting();
+                break;
+            case RobotState.Presenting1:
+            case RobotState.Presenting2:
+            case RobotState.Presenting3:
+            case RobotState.Presenting4:
+            case RobotState.Presenting5:
+            case RobotState.Presenting6:
+                Robot.NextPresentationStep();
+                break;
+            case RobotState.ReadyForSolve:
+                await SolveCube();
+                break;
         }
+    }
+
+    private async Task SolveCube()
+    {
+        System.Diagnostics.Stopwatch stopwatch = new();
+
+        // Setup timer for periodical time updates
+        System.Threading.Timer timer = new((e) =>
+        {
+            InvokeAsync(() =>
+            {
+                _solveTimeText = stopwatch.Elapsed.ToString(@"mm\:ss\.fff"); StateHasChanged();
+            });
+        },null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
+        
+        stopwatch.Start();
+        IEnumerable<CubeMove> moveQueue = [.. (await Task.Run(() => Solver.SolveCube(_cube)))];
+        stopwatch.Stop();
+
+        _solveTimeText = stopwatch.Elapsed.ToString(@"mm\:ss\.fff");
+        StateHasChanged();
+        
+        // Send moves to robot
+        Robot.SolveCube(moveQueue);
     }
 
     private void SkipRobotStep()
     {
-        
+        Robot.SkipState();
     }
 
 }

@@ -8,7 +8,7 @@ public enum RobotState
     Disconnected,
     [Description("Brak kostki")]
     NoCube,
-    [Description("Gotowy do analizy")]
+    [Description("Gotowy do prezentacji")]
     ReadyForPhotos,
     [Description("Prezentuje kostkę (1/6)")]
     Presenting1,
@@ -22,6 +22,8 @@ public enum RobotState
     Presenting5,
     [Description("Prezentuje kostkę (6/6)")]
     Presenting6,
+    [Description("Gotowy do ułożenia")]
+    ReadyForSolve,
     [Description("Układa kostkę")]
     Solving,
     [Description("Gotowy do odbioru kostki")]
