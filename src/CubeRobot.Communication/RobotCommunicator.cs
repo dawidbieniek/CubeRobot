@@ -8,6 +8,7 @@ namespace CubeRobot.Robot;
 internal class RobotCommunicator : IDisposable
 {
     private readonly CommunicationChannelBase _communication;
+    private readonly ConnectionEstablisher _connectionEstablisher;
     private readonly Queue<RobotMove> _commandQueue = [];
     /// <summary>
     /// Queue holding moves to be performed along counters indicating number of commands to perform
@@ -18,11 +19,17 @@ internal class RobotCommunicator : IDisposable
     public RobotCommunicator(CommunicationChannelBase communication)
     {
         _communication = communication;
-        _communication.DataRecieved += OnDataRecieved;
+        _connectionEstablisher = new(communication);
+
+        _connectionEstablisher.CommunicationEstablished += (s, e) => { _communication.DataRecieved += OnDataRecieved; CommunicationEstablished?.Invoke(this, EventArgs.Empty); };
+        _connectionEstablisher.CommunicationEstablishmentFailed += (s, e) => CommunicationEstablishmentFailed?.Invoke(this, EventArgs.Empty);
+        _connectionEstablisher.StartConnection();
     }
 
     public event CommandQueueChangedEventHandler CommandQueueChanged = delegate { };
     public event MoveQueueChangedEventHandler MoveQueueChanged = delegate { };
+    public event EventHandler CommunicationEstablished = delegate { };
+    public event EventHandler CommunicationEstablishmentFailed = delegate { };
 
     public void SendMovesToRobot(IEnumerable<RobotMove> robotMoves, IEnumerable<MutablePair<CubeMove, int>>? cubeMoves = null)
     {

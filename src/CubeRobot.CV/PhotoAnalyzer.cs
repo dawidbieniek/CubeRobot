@@ -122,7 +122,7 @@ public class PhotoAnalyzer(PreprocessingSettings? settings = null)
         return image.ToBytes();
     }
 
-    public IAsyncEnumerator<byte[]> PreprocessImageStepByStep(byte[] imageRawData) => ImagePreprocessor.PreprocessImageStepByStep(Mat.FromImageData(imageRawData), Settings);
+    public IAsyncEnumerator<byte[]> GetNextImageProcessingStep(byte[] imageRawData) => ImagePreprocessor.PreprocessImageStepByStep(Mat.FromImageData(imageRawData), Settings);
 
     public readonly struct FragmentData()
     {

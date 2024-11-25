@@ -13,11 +13,11 @@
         <!-- Error Display Section -->
         <div class="container-fluid">
             <div class="col-md-12">
-                @foreach(string error in _errors)
+                @foreach ((Guid errorId, string error) in _errors)
                 {
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         @error
-                        <button @onclick="() => DismissError(error)" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button @onclick="() => DismissError(errorId)" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
             </div>
@@ -27,16 +27,22 @@
 
 @code
 {
-    private List<string> _errors = [];
+    private Dictionary<Guid, string> _errors = [];
 
-    public void AddErrors(params string[] errors)
+    public void AddError(string error, Guid? errorId = null)
     {
-        _errors.AddRange(errors);
+        errorId ??= Guid.NewGuid();
+
+        _errors.Add(errorId.Value, error);
         StateHasChanged();
     }
 
-    private void DismissError(string error)
+    public void ClearError(Guid errorId) => DismissError(errorId);
+
+
+    private void DismissError(Guid errorId)
     {
-        _errors.Remove(error);
+        _errors.Remove(errorId);
+        StateHasChanged();
     }
 }

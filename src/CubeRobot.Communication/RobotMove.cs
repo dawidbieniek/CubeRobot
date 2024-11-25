@@ -3,23 +3,23 @@
 public enum RobotMove
 {
     Separator = ';',
-    Stop = 's',
-    RotateFrontClockwise = 'f',
-    RotateFrontCounterClockwise = 'F',
-    RotateRightClockwise = 'r',
-    RotateRightCounterClockwise = 'R',
-    RotateLeftClockwise = 'l',
-    RotateLeftCounterClockwise = 'L',
-    RotateBackClockwise = 'b',
-    RotateBackCounterClockwise = 'B',
-    MoveFrontForward = 'j',
-    MoveFrontBackward = 'J',
-    MoveRightForward = 'k',
-    MoveRightBackward = 'K',
-    MoveLeftForward = 'h',
-    MoveLeftBackward = 'H',
-    MoveBackForward = 'u',
-    MoveBackBackward = 'U'
+    Stop = 'q',
+    RotateFrontClockwise = 'F',
+    RotateFrontCounterClockwise = 'f',
+    RotateRightClockwise = 'R',
+    RotateRightCounterClockwise = 'r',
+    RotateLeftClockwise = 'L',
+    RotateLeftCounterClockwise = 'l',
+    RotateBackClockwise = 'B',
+    RotateBackCounterClockwise = 'b',
+    MoveFrontForward = 'S',
+    MoveFrontBackward = 's',
+    MoveRightForward = 'D',
+    MoveRightBackward = 'd',
+    MoveLeftForward = 'A',
+    MoveLeftBackward = 'a',
+    MoveBackForward = 'W',
+    MoveBackBackward = 'w'
 }
 
 internal static class HighLevelRobotMove

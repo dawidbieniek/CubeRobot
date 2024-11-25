@@ -21,24 +21,22 @@ public sealed class SerialPortCommunication : CommunicationChannelBase, IDisposa
         _port.Close();
     }
 
-    public override void SendMovesToRobot(IEnumerable<RobotMove> moves)
+    public override void SendTextToRobot(string text)
     {
-        _port.Write(moves.ToProtocolString());
+        _port.Write(text);
 
 #if DEBUG
-        Debug.Write("Out ");
-        Debug.WriteLine(moves.ToProtocolString());
+        Debug.WriteLine($"Sending '{text}'");
 #endif
     }
 
     private void OnPortDataRecieved(object sender, SerialDataReceivedEventArgs e)
     {
-        string data = _port.ReadExisting().ToString();
+        string data = _port.ReadExisting();
         OnDataRecieved(new(data));
 
 #if DEBUG
-        Debug.Write("In  ");
-        Debug.WriteLine(data);
+        Debug.WriteLine($"Recieved '{data}'");
 #endif
     }
 }

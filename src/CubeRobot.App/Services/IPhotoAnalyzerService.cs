@@ -11,7 +11,7 @@ public interface IPhotoAnalyzerService
 
     CubeFaceColor[,] ExtractColorsFromImage(byte[] imageData);
 
-    IAsyncEnumerator<byte[]> GetProcessedImagesStepByStep(byte[] imageRawData);
+    IAsyncEnumerator<byte[]> GetNextImageProcessingStep(byte[] imageRawData);
 
     FragmentData ExtractFragmentDataFromImage(byte[] imageData);
 }

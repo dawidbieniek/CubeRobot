@@ -1,14 +1,58 @@
 ﻿@using CubeRobot.Robot
 
-<button type="button" class="btn btn-secondary me-2" disabled @onclick="OnSkipStep">Pomiń krok</button>
-<button type="button" class="btn btn-primary" @onclick="OnNextStep">Następny krok</button>
+<button type="button" class="btn btn-secondary me-2" disabled="@_skipButtonDisabled" @onclick="OnSkipStep">Pomiń krok</button>
+<button type="button" class="btn btn-primary" disabled="@_nextButtonDisabled" @onclick="OnNextStep">Następny krok</button>
 
 @code 
 {
+    private bool _nextButtonDisabled = false;
+    private bool _skipButtonDisabled = false;
+
+
     [Parameter]
     public RobotState RobotState { get; set; }
     [Parameter]
     public EventCallback OnSkipStep { get; set; }
     [Parameter]
     public EventCallback OnNextStep { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        switch(RobotState)
+        {
+            case RobotState.Disconnected:
+                _nextButtonDisabled = true;
+                _skipButtonDisabled = true;
+                break;
+            case RobotState.NoCube:
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = true;
+                break;
+            case RobotState.ReadyForPhotos:
+            case RobotState.Presenting1:
+            case RobotState.Presenting2:
+            case RobotState.Presenting3:
+            case RobotState.Presenting4:
+            case RobotState.Presenting5:
+            case RobotState.Presenting6:
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
+            case RobotState.Solving:
+                // TODO: Disable until solved?
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
+            case RobotState.ReadyForRelease:
+                _nextButtonDisabled = false;
+                _skipButtonDisabled = false;
+                break;
+            case RobotState.Resetting:
+                _nextButtonDisabled = true;
+                _skipButtonDisabled = true;
+                break;
+        }
+    }
 }

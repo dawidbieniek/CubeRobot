@@ -2,7 +2,7 @@
 
 <label for="portSelect">Port USB</label>
 <InputSelect id="portSelect" class="form-control" Value="@_selectedPortName" ValueExpression="@(() => _selectedPortName)" ValueChanged="(string v) => ChangeSelection(v)">
-    <option value="None">Brak</option>
+    <option value="Brak">Brak</option>
     @foreach (string option in SerialPortCommunication.ValidPorts)
     {
         <option value="@option">@option</option>
@@ -14,7 +14,7 @@
     [Parameter]
     public EventCallback<string> SelectionChanged { get; set; }
 
-    private string _selectedPortName = string.Empty;
+    private string _selectedPortName = "Brak";
 
     private async Task ChangeSelection(string value)
     {

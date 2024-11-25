@@ -51,10 +51,10 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <CubeMoveProgressQueue @ref="_cubeMoveProgressQueue" Title="Pozostałe ruchy" Queue="_moveQueue" />
+                        <CubeMoveProgressQueue @ref="_cubeMoveProgressQueue" Title="Pozostałe ruchy"/>
                     </div>
                     <div class="form-row">
-                        <RobotMoveProgressQueue @ref="_robotMoveProgressQueue" Title="Pozostałe komendy" Queue="_commandQueue"/>
+                        <RobotMoveProgressQueue @ref="_robotMoveProgressQueue" Title="Pozostałe komendy"/>
                     </div>
                 </div>
             </div>
@@ -86,13 +86,12 @@
 
     [CascadingParameter]
     private IErrorDisplay ErrorDisplay { get; set; } = null!;
+    private Guid _portConnectionFailureId = Guid.NewGuid();
 
     private ICubeSolver Solver = new TwoPhaseSolver();
-    private Cube _cube = new(3, true);
+    private Cube _cube = new(3, initializeColors:false);
 
-    private List<RobotMove> _commandQueue = [];
     private RobotMoveProgressQueue _robotMoveProgressQueue = null!; // Reference
-    private List<CubeMove> _moveQueue = [];
     private CubeMoveProgressQueue _cubeMoveProgressQueue = null!; // Reference
 
     private RobotState _robotState = RobotState.Disconnected;
@@ -101,10 +100,12 @@
 
     protected override void OnInitialized()
     {
-        Robot.RobotStateChanged += (s, e) => _robotState = e.CurrentState;
+        Robot.RobotStateChanged += (s, e) => InvokeAsync(() => { _robotState = e.CurrentState; StateHasChanged(); });
         Robot.MoveQueueChanged += (s, e) => InvokeAsync(() => OnRobotMoveQueueChanged(s, e));
         Robot.CommandQueueChanged += (s, e) => InvokeAsync(() => OnRobotCommandQueueChanged(s, e));
         Robot.RobotEffectorsStateChanged += (s, e) => InvokeAsync(() => OnRobotEffectorsStateChanged(s, e));
+        Robot.ConnectionEstablished += (s, e) => InvokeAsync(() => ErrorDisplay.ClearError(_portConnectionFailureId));
+        Robot.ConnectionEstablishmentFailed += (s, e) => InvokeAsync(() => OnConnectionEstablishmentFailed(s, e));
     }
 
     protected override void OnParametersSet()
@@ -118,20 +119,22 @@
 
     private void OnRobotMoveQueueChanged(object sender, MoveQueueEventArgs e)
     {
-        if (e.FinishedMove is null)
-            _moveQueue = [.. e.RemainingMoves];
+        if (e.FinishedMove is null)    // Queue initialization
+            _cubeMoveProgressQueue.Initialize([.. e.RemainingMoves]);
         else
-            _robotMoveProgressQueue.AdvanceProgress();
-
-        StateHasChanged();
+            _cubeMoveProgressQueue.AdvanceProgress();
     }
 
     private void OnRobotCommandQueueChanged(object sender, CommandQueueEventArgs e)
     {
-        if (e.FinishedCommands.Count() == 0)
-            _commandQueue = [.. e.RemainingCommands];
+        if (e.FinishedCommands.Count() == 0)    // Queue initialization
+            _robotMoveProgressQueue.Initialize([.. e.RemainingCommands]);
         else
-            _robotMoveProgressQueue.AdvanceProgress(e.RemainingCommands.Count());
+        {
+            _robotMoveProgressQueue.AdvanceProgress(e.FinishedCommands.Count());
+            System.Diagnostics.Debug.WriteLine($"Removing from queue '{e.FinishedCommands.ToProtocolString()}'");
+            System.Diagnostics.Debug.WriteLine($"Remaining '{e.RemainingCommands.ToProtocolString()}'");
+        }
     }
 
     private void OnRobotEffectorsStateChanged(object sender, RobotEffectorsEventArgs e)
@@ -142,9 +145,17 @@
         StateHasChanged();
     }
 
+    private void OnConnectionEstablishmentFailed(object? sender, EventArgs e)
+    {
+        ErrorDisplay.AddError("Nie można połączyć się na wybranym porcie", _portConnectionFailureId);
+        // TODO: Change selected port to Brak
+
+        StateHasChanged();
+    }
+
     private void ChangeSelectedPort(string portName)
     {
-        if (portName == "None")
+        if (portName == "Brak")
             return;
         Robot.ConfigureCommunicationChannel(new SerialPortCommunication(portName));
     }
@@ -154,12 +165,12 @@
         Solver = algorithm.Solver();
     }
 
-    private void NextRobotStep()
+    private async Task NextRobotStep()
     {
         if(Robot.CurrentState == RobotState.NoCube)
         {
-            _moveQueue = [..Solver.SolveCube(_cube)];
-            Robot.SolveCube(_moveQueue);
+            IEnumerable<CubeMove> moveQueue = [.. (await Task.Run(() => Solver.SolveCube(_cube)))];
+            Robot.SolveCube(moveQueue);
             return;
         }
     }

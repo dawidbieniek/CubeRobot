@@ -13,7 +13,7 @@ internal class PhotoAnalyzerService : IPhotoAnalyzerService
 
     public CubeFaceColor[,] ExtractColorsFromImage(byte[] imageData) => _photoAnalyzer.ExtractColorsFromImage(imageData);
 
-    public IAsyncEnumerator<byte[]> GetProcessedImagesStepByStep(byte[] imageRawData) => _photoAnalyzer.PreprocessImageStepByStep(imageRawData);
+    public IAsyncEnumerator<byte[]> GetNextImageProcessingStep(byte[] imageRawData) => _photoAnalyzer.GetNextImageProcessingStep(imageRawData);
 
     public FragmentData ExtractFragmentDataFromImage(byte[] imageData) => _photoAnalyzer.ExtractFragmentDataFromImage(imageData);
 }
