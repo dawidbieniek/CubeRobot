@@ -21,12 +21,12 @@ public sealed class SerialPortCommunication : CommunicationChannelBase, IDisposa
         _port.Close();
     }
 
-    public override void SendMovesToRobot(IEnumerable<RobotMove> moves)
+    public override void SendTextToRobot(string text)
     {
-        _port.Write(moves.ToProtocolString());
+        _port.Write(text);
 
 #if DEBUG
-        Debug.WriteLine($"Sending '{moves.ToProtocolString()}'");
+        Debug.WriteLine($"Sending '{text}'");
 #endif
     }
 

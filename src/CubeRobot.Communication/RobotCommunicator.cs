@@ -7,9 +7,8 @@ namespace CubeRobot.Robot;
 
 internal class RobotCommunicator : IDisposable
 {
-    private const string CommunicationStartMessage = "Start";
-
     private readonly CommunicationChannelBase _communication;
+    private readonly ConnectionEstablisher _connectionEstablisher;
     private readonly Queue<RobotMove> _commandQueue = [];
     /// <summary>
     /// Queue holding moves to be performed along counters indicating number of commands to perform
@@ -20,12 +19,17 @@ internal class RobotCommunicator : IDisposable
     public RobotCommunicator(CommunicationChannelBase communication)
     {
         _communication = communication;
-        _communication.DataRecieved += OnDataRecieved;
+        _connectionEstablisher = new(communication);
+
+        _connectionEstablisher.CommunicationEstablished += (s, e) => { _communication.DataRecieved += OnDataRecieved; CommunicationEstablished?.Invoke(this, EventArgs.Empty); };
+        _connectionEstablisher.CommunicationEstablishmentFailed += (s, e) => CommunicationEstablishmentFailed?.Invoke(this, EventArgs.Empty);
+        _connectionEstablisher.StartConnection();
     }
 
     public event CommandQueueChangedEventHandler CommandQueueChanged = delegate { };
     public event MoveQueueChangedEventHandler MoveQueueChanged = delegate { };
     public event EventHandler CommunicationEstablished = delegate { };
+    public event EventHandler CommunicationEstablishmentFailed = delegate { };
 
     public void SendMovesToRobot(IEnumerable<RobotMove> robotMoves, IEnumerable<MutablePair<CubeMove, int>>? cubeMoves = null)
     {
@@ -52,9 +56,6 @@ internal class RobotCommunicator : IDisposable
 
     private void OnDataRecieved(object sender, CommunicationChannelDataEventArgs e)
     {
-        if (e.RecievedData.Contains(CommunicationStartMessage))
-            CommunicationEstablished?.Invoke(this, new());
-
         int dotCount = e.RecievedData.Count(c => c == '.');
 
         for (int i = 0; i < dotCount; i++)

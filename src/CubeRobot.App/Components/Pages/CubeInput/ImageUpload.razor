@@ -77,12 +77,12 @@
             {
                 if (_uploadedImages.Count >= MaxFileCount)
                 {
-                    ErrorDisplay.AddErrors($"Can't upload more than {MaxFileCount} files");
+                    ErrorDisplay.AddError($"Can't upload more than {MaxFileCount} files");
                     return;
                 }
                 if (!file.ContentType.StartsWith("image"))
                 {
-                    ErrorDisplay.AddErrors($"Unsupported file type: {file.ContentType}");
+                    ErrorDisplay.AddError($"Unsupported file type: {file.ContentType}");
                     return;
                 }
 
@@ -93,11 +93,11 @@
         }
         catch (InvalidOperationException)
         {
-            ErrorDisplay.AddErrors($"Can't upload more than {MaxFileCount} files");
+            ErrorDisplay.AddError($"Can't upload more than {MaxFileCount} files");
         }
         catch (IOException ex)
         {
-            ErrorDisplay.AddErrors($"Cannot upload file ({ex.Message})");
+            ErrorDisplay.AddError($"Cannot upload file ({ex.Message})");
         }
 
     }
@@ -149,7 +149,7 @@
         }
         catch(Exception ex)
         {
-            ErrorDisplay.AddErrors(ex.Message);
+            ErrorDisplay.AddError(ex.Message);
         }
     }
 

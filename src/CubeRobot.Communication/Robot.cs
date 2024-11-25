@@ -23,6 +23,8 @@ public class Robot : IRobot
     }
     public event CommandQueueChangedEventHandler CommandQueueChanged = delegate { };
     public event MoveQueueChangedEventHandler MoveQueueChanged = delegate { };
+    public event EventHandler ConnectionEstablished = delegate {};
+    public event EventHandler ConnectionEstablishmentFailed = delegate {};
     public RobotState CurrentState
     {
         get => _stateManager.CurrentState;
@@ -35,7 +37,8 @@ public class Robot : IRobot
         _communicator = new(channel);
         _communicator.MoveQueueChanged += MoveQueueChanged;
         _communicator.CommandQueueChanged += CommandQueueChanged;
-        _communicator.CommunicationEstablished += (s, e) => CurrentState = RobotState.NoCube;
+        _communicator.CommunicationEstablished += (s, e) => { CurrentState = RobotState.NoCube; ConnectionEstablished?.Invoke(this, EventArgs.Empty); };
+        _communicator.CommunicationEstablishmentFailed += (s, e) => { CurrentState = RobotState.Disconnected; ConnectionEstablishmentFailed?.Invoke(this, EventArgs.Empty); };
     }
 
     public void GrabCube()
