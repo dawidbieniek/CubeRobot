@@ -74,11 +74,18 @@ There are several options available for instalation of C++ code onto Arduino boa
 4. **Upload the Code:** Click the "Run" or "Upload" button and wait for code to upload
 
 ## Screenshots
-Give some screenshots of an app or its results for bragging puproses
+### Built robot
+![Robot][ss-robot]
+### Application after connecting to robot
+![Setup][ss-setup]
+### Image recognition steps
+![Steps][ss-irSteps]
+### Image upload screen
+![Image upload][ss-uploading]
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[app-screenshot]: https://placehold.co/600x400
+[app-screenshot]: img/duringWork.png
 [dotnet-badge]: https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white
 [dotnet-url]: https://dotnet.microsoft.com/en-us/
 [bootstrap-badge]: https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white
@@ -91,3 +98,8 @@ Give some screenshots of an app or its results for bragging puproses
 [arduino-url]: https://www.arduino.cc/
 [opencv-badge]: https://img.shields.io/badge/opencvsharp-5C3EE8?style=for-the-badge
 [opencv-url]: https://github.com/shimat/opencvsharp
+
+[ss-setup]: img/setup.png
+[ss-irSteps]: img/irSteps.png
+[ss-uploading]: img/uploading.png
+[ss-robot]: img/robot.png
