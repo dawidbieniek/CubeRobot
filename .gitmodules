@@ -1,0 +1,3 @@
+[submodule "DesktopApp/src/Kociemba"]
+	path = DesktopApp/src/Kociemba
+	url = git@github.com:dawidbieniek/Kociemba.git
